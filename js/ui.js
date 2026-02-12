@@ -369,7 +369,7 @@ const UI = {
         }
 
         // Create dropdown of available clients
-        let html = '<select class="client-select" data-employee-id="${employee.id}">';
+        let html = `<select class="client-select" data-employee-id="${employee.id}">`;
         html += '<option value="">Select Client...</option>';
 
         clients.forEach(client => {
