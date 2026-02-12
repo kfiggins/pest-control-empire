@@ -11,8 +11,8 @@ const Game = {
         clients: [],
         employees: [],
         trucks: [],
-        equipment: [],
-        upgrades: [],
+        ownedEquipment: [],
+        ownedUpgrades: [],
 
         // Weekly tracking
         weeklyRevenue: 0,
@@ -82,6 +82,10 @@ const Game = {
     processJobs() {
         let jobsCompleted = 0;
 
+        // Get equipment and upgrade bonuses
+        const equipmentBonuses = EquipmentManager.calculateEquipmentBonuses(this.state.ownedEquipment);
+        const upgradeEffects = EquipmentManager.calculateUpgradeEffects(this.state.ownedUpgrades);
+
         // Process each employee's assignments
         this.state.employees.forEach(employee => {
             // Service all assigned clients
@@ -89,8 +93,8 @@ const Game = {
                 const client = this.state.clients.find(c => c.id === clientId);
 
                 if (client) {
-                    // Service the client
-                    const result = EmployeeManager.serviceClient(employee, client);
+                    // Service the client with bonuses
+                    const result = EmployeeManager.serviceClient(employee, client, equipmentBonuses, upgradeEffects);
 
                     if (result.success) {
                         jobsCompleted++;
@@ -110,6 +114,9 @@ const Game = {
 
     // Process all revenue sources
     processRevenue() {
+        // Get upgrade effects for revenue bonuses
+        const upgradeEffects = EquipmentManager.calculateUpgradeEffects(this.state.ownedUpgrades);
+
         // Process client revenue
         let clientRevenue = 0;
         let servicedClients = 0;
@@ -119,7 +126,14 @@ const Game = {
             // Check if client has an employee assigned
             const hasEmployee = this.state.employees.some(emp => emp.assignedClients.includes(client.id));
 
-            const revenue = ClientManager.calculateRevenue(client, hasEmployee);
+            let revenue = ClientManager.calculateRevenue(client, hasEmployee);
+
+            // Apply revenue bonus from upgrades
+            if (revenue > 0 && upgradeEffects.revenueBonus > 0) {
+                revenue *= (1 + upgradeEffects.revenueBonus);
+                revenue = Math.floor(revenue);
+            }
+
             clientRevenue += revenue;
             client.totalRevenue += revenue;
             client.weeksActive++;
@@ -257,8 +271,8 @@ const Game = {
             clients: [],
             employees: [],
             trucks: [],
-            equipment: [],
-            upgrades: [],
+            ownedEquipment: [],
+            ownedUpgrades: [],
             weeklyRevenue: 0,
             weeklyExpenses: 0,
             stats: {
@@ -397,6 +411,70 @@ const Game = {
         }
 
         return success;
+    },
+
+    // Purchase equipment
+    purchaseEquipment(equipmentId) {
+        const equipment = EquipmentManager.equipment[equipmentId];
+
+        if (!equipment) {
+            return false;
+        }
+
+        // Check if can purchase (prerequisites)
+        if (!EquipmentManager.canPurchaseEquipment(equipmentId, this.state.ownedEquipment)) {
+            this.logAction(`❌ Cannot purchase ${equipment.name} - prerequisites not met or already owned`);
+            return false;
+        }
+
+        // Check if we can afford it
+        if (this.state.money < equipment.cost) {
+            this.logAction(`❌ Cannot purchase ${equipment.name} - insufficient funds (need ${this.formatMoney(equipment.cost)})`);
+            return false;
+        }
+
+        // Deduct cost
+        this.state.money -= equipment.cost;
+
+        // Add equipment
+        this.state.ownedEquipment.push(equipmentId);
+
+        this.logAction(`✅ Purchased ${equipment.name} - Cost: ${this.formatMoney(equipment.cost)}`);
+
+        console.log(`🔧 New equipment: ${equipment.name}`, equipment);
+        return true;
+    },
+
+    // Purchase upgrade
+    purchaseUpgrade(upgradeId) {
+        const upgrade = EquipmentManager.upgrades[upgradeId];
+
+        if (!upgrade) {
+            return false;
+        }
+
+        // Check if can purchase (prerequisites)
+        if (!EquipmentManager.canPurchaseUpgrade(upgradeId, this.state.ownedUpgrades)) {
+            this.logAction(`❌ Cannot purchase ${upgrade.name} - prerequisites not met or already owned`);
+            return false;
+        }
+
+        // Check if we can afford it
+        if (this.state.money < upgrade.cost) {
+            this.logAction(`❌ Cannot purchase ${upgrade.name} - insufficient funds (need ${this.formatMoney(upgrade.cost)})`);
+            return false;
+        }
+
+        // Deduct cost
+        this.state.money -= upgrade.cost;
+
+        // Add upgrade
+        this.state.ownedUpgrades.push(upgradeId);
+
+        this.logAction(`✅ Purchased ${upgrade.name} - Cost: ${this.formatMoney(upgrade.cost)}`);
+
+        console.log(`⬆️ New upgrade: ${upgrade.name}`, upgrade);
+        return true;
     }
 };
 

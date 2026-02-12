@@ -46,6 +46,8 @@ const UI = {
             // Lists
             clientList: document.getElementById('client-list'),
             employeeList: document.getElementById('employee-list'),
+            equipmentList: document.getElementById('equipment-list'),
+            upgradeTree: document.getElementById('upgrade-tree'),
 
             // Action log
             actionLog: document.getElementById('action-log'),
@@ -182,6 +184,12 @@ const UI = {
 
         // Render employee list
         this.renderEmployeeList();
+
+        // Render equipment shop
+        this.renderEquipmentShop();
+
+        // Render upgrade tree
+        this.renderUpgradeTree();
     },
 
     // Add entry to action log
@@ -432,6 +440,175 @@ const UI = {
                 const clientId = e.target.dataset.clientId;
                 Game.unassignEmployee(employeeId, clientId);
                 this.update();
+            });
+        });
+    },
+
+    // Render equipment shop
+    renderEquipmentShop() {
+        const state = Game.getState();
+        const equipmentList = this.elements.equipmentList;
+
+        if (!equipmentList) return;
+
+        // Clear existing content
+        equipmentList.innerHTML = '';
+
+        // Get available equipment
+        const available = EquipmentManager.getAvailableEquipment(state.ownedEquipment);
+
+        // Show owned equipment
+        if (state.ownedEquipment.length > 0) {
+            const ownedSection = document.createElement('div');
+            ownedSection.className = 'owned-equipment';
+            ownedSection.innerHTML = '<h3>Owned Equipment</h3>';
+
+            state.ownedEquipment.forEach(equipId => {
+                const equip = EquipmentManager.equipment[equipId];
+                if (equip) {
+                    const equipTag = document.createElement('div');
+                    equipTag.className = 'equipment-tag owned';
+                    equipTag.textContent = equip.name;
+                    ownedSection.appendChild(equipTag);
+                }
+            });
+
+            equipmentList.appendChild(ownedSection);
+        }
+
+        // Show available equipment for purchase
+        if (available.length === 0) {
+            const emptyState = document.createElement('p');
+            emptyState.className = 'empty-state';
+            emptyState.textContent = state.ownedEquipment.length > 0 ?
+                'All available equipment purchased!' :
+                'No equipment available yet.';
+            equipmentList.appendChild(emptyState);
+            return;
+        }
+
+        available.forEach(equip => {
+            const equipCard = document.createElement('div');
+            equipCard.className = 'equipment-card';
+
+            const canAfford = state.money >= equip.cost;
+
+            equipCard.innerHTML = `
+                <div class="equipment-header">
+                    <div class="equipment-name">${equip.name}</div>
+                    <div class="equipment-tier">Tier ${equip.tier}</div>
+                </div>
+                <div class="equipment-description">${equip.description}</div>
+                <div class="equipment-stats">
+                    ${equip.satisfactionBonus ? `<span>+${equip.satisfactionBonus} Satisfaction</span>` : ''}
+                    ${equip.speedBonus ? `<span>+${equip.speedBonus}% Speed</span>` : ''}
+                    ${equip.ecoBonus ? `<span>+${equip.ecoBonus} Eco Bonus</span>` : ''}
+                </div>
+                <div class="equipment-footer">
+                    <span class="equipment-cost ${canAfford ? 'positive' : 'negative'}">${Game.formatMoney(equip.cost)}</span>
+                    <button class="btn btn-small ${canAfford ? 'btn-primary' : 'btn-disabled'}"
+                            data-equipment-id="${equip.id}"
+                            ${!canAfford ? 'disabled' : ''}>
+                        Purchase
+                    </button>
+                </div>
+            `;
+
+            equipmentList.appendChild(equipCard);
+        });
+
+        // Add event listeners to purchase buttons
+        const purchaseButtons = equipmentList.querySelectorAll('button[data-equipment-id]');
+        purchaseButtons.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const equipmentId = e.target.dataset.equipmentId;
+                const success = Game.purchaseEquipment(equipmentId);
+                if (success) {
+                    this.update();
+                }
+            });
+        });
+    },
+
+    // Render upgrade tree
+    renderUpgradeTree() {
+        const state = Game.getState();
+        const upgradeTree = this.elements.upgradeTree;
+
+        if (!upgradeTree) return;
+
+        // Clear existing content
+        upgradeTree.innerHTML = '';
+
+        // Create sections for each upgrade path
+        const paths = ['speed', 'service', 'eco'];
+        const pathNames = {
+            speed: 'Speed Path',
+            service: 'Customer Service Path',
+            eco: 'Eco-Friendly Path'
+        };
+
+        paths.forEach(path => {
+            const pathSection = document.createElement('div');
+            pathSection.className = 'upgrade-path';
+            pathSection.innerHTML = `<h3>${pathNames[path]}</h3>`;
+
+            const upgrades = EquipmentManager.getUpgradesByPath(path);
+
+            upgrades.forEach(upgrade => {
+                const owned = state.ownedUpgrades.includes(upgrade.id);
+                const canPurchase = EquipmentManager.canPurchaseUpgrade(upgrade.id, state.ownedUpgrades);
+                const canAfford = state.money >= upgrade.cost;
+
+                const upgradeCard = document.createElement('div');
+                upgradeCard.className = `upgrade-card ${owned ? 'owned' : ''} ${!canPurchase && !owned ? 'locked' : ''}`;
+
+                // Build effects display
+                let effectsHTML = '';
+                if (upgrade.effects) {
+                    Object.keys(upgrade.effects).forEach(key => {
+                        const value = upgrade.effects[key];
+                        const displayValue = key.includes('Bonus') && value < 1 ?
+                            `+${Math.round(value * 100)}%` :
+                            `+${value}`;
+                        effectsHTML += `<span>${displayValue} ${key.replace(/([A-Z])/g, ' $1').trim()}</span>`;
+                    });
+                }
+
+                upgradeCard.innerHTML = `
+                    <div class="upgrade-header">
+                        <div class="upgrade-name">${upgrade.name} ${owned ? '✓' : ''}</div>
+                        <div class="upgrade-tier">Tier ${upgrade.tier}</div>
+                    </div>
+                    <div class="upgrade-description">${upgrade.description}</div>
+                    <div class="upgrade-effects">${effectsHTML}</div>
+                    ${!owned ? `
+                        <div class="upgrade-footer">
+                            <span class="upgrade-cost ${canAfford ? 'positive' : 'negative'}">${Game.formatMoney(upgrade.cost)}</span>
+                            <button class="btn btn-small ${canPurchase && canAfford ? 'btn-primary' : 'btn-disabled'}"
+                                    data-upgrade-id="${upgrade.id}"
+                                    ${!canPurchase || !canAfford ? 'disabled' : ''}>
+                                ${!canPurchase ? 'Locked' : 'Purchase'}
+                            </button>
+                        </div>
+                    ` : ''}
+                `;
+
+                pathSection.appendChild(upgradeCard);
+            });
+
+            upgradeTree.appendChild(pathSection);
+        });
+
+        // Add event listeners to purchase buttons
+        const purchaseButtons = upgradeTree.querySelectorAll('button[data-upgrade-id]');
+        purchaseButtons.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const upgradeId = e.target.dataset.upgradeId;
+                const success = Game.purchaseUpgrade(upgradeId);
+                if (success) {
+                    this.update();
+                }
             });
         });
     }

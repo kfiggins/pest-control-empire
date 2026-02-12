@@ -117,11 +117,17 @@ const EmployeeManager = {
     },
 
     // Service a client (called during turn)
-    serviceClient(employee, client) {
+    serviceClient(employee, client, equipmentBonuses = {}, upgradeEffects = {}) {
         const skill = employee.skillData;
 
         // Base satisfaction restoration
         let satisfactionGain = skill.satisfactionBonus;
+
+        // Add equipment bonuses
+        satisfactionGain += equipmentBonuses.satisfactionBonus || 0;
+
+        // Add upgrade bonuses
+        satisfactionGain += upgradeEffects.satisfactionBonus || 0;
 
         // Match employee skill to client demands
         const clientType = client.typeData;
@@ -132,9 +138,20 @@ const EmployeeManager = {
             satisfactionGain += 5;
         }
 
+        // Speed-focused clients benefit from speed upgrades
+        if (client.type === 'SPEED_FOCUSED' && upgradeEffects.speedClientBonus) {
+            satisfactionGain += upgradeEffects.speedClientBonus;
+        }
+
         // Eco-focused clients benefit from expert employees
         if (client.type === 'ECO_FOCUSED' && employee.skillLevel === 'EXPERT') {
             satisfactionGain += 5;
+        }
+
+        // Eco-focused clients benefit from eco equipment and upgrades
+        if (client.type === 'ECO_FOCUSED') {
+            satisfactionGain += equipmentBonuses.ecoBonus || 0;
+            satisfactionGain += upgradeEffects.ecoClientBonus || 0;
         }
 
         // Restore satisfaction
