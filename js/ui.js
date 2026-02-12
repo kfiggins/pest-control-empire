@@ -280,6 +280,9 @@ const UI = {
         // Update victory progress
         this.updateVictoryProgress();
 
+        // Update tab badges with contextual info
+        this.updateTabBadges();
+
         // Check for active events and display notification
         this.displayEventNotification();
 
@@ -332,6 +335,66 @@ const UI = {
         if (employeesBarEl) {
             employeesBarEl.style.width = `${employeesProgress}%`;
             employeesBarEl.style.backgroundColor = employeesProgress >= 100 ? 'var(--color-primary)' : 'var(--color-secondary)';
+        }
+    },
+
+    // Update tab badges with contextual information
+    updateTabBadges() {
+        const state = Game.getState();
+
+        // Update Clients tab: Show assigned/total
+        const clientsTabBtn = document.querySelector('.tab-button[data-tab="clients"]');
+        const clientsBottomNav = document.querySelector('.bottom-nav-item[data-tab="clients"]');
+
+        if (clientsTabBtn || clientsBottomNav) {
+            // Count assigned clients (clients that have at least one employee assigned)
+            const assignedCount = state.clients.filter(client => {
+                return state.employees.some(emp => emp.assignedClients.includes(client.id));
+            }).length;
+
+            const totalCount = state.clients.length;
+            const clientBadge = totalCount > 0 ? ` <span class="tab-badge">${assignedCount}/${totalCount}</span>` : '';
+
+            if (clientsTabBtn) {
+                clientsTabBtn.innerHTML = `👥 Clients${clientBadge}`;
+            }
+            if (clientsBottomNav) {
+                const label = clientsBottomNav.querySelector('.label');
+                if (label) {
+                    label.innerHTML = totalCount > 0 ? `Clients <span class="nav-badge">${assignedCount}/${totalCount}</span>` : 'Clients';
+                }
+            }
+        }
+
+        // Update Employees tab: Show count + promotion notification
+        const employeesTabBtn = document.querySelector('.tab-button[data-tab="employees"]');
+        const employeesBottomNav = document.querySelector('.bottom-nav-item[data-tab="employees"]');
+
+        if (employeesTabBtn || employeesBottomNav) {
+            const employeeCount = state.employees.length;
+
+            // Count employees eligible for promotion
+            const promotableCount = state.employees.filter(emp => {
+                const promotionInfo = EmployeeManager.getPromotionInfo(emp);
+                return promotionInfo && promotionInfo.canPromote;
+            }).length;
+
+            const empBadge = employeeCount > 0 ? ` <span class="tab-badge">${employeeCount}</span>` : '';
+            const promotionIndicator = promotableCount > 0 ? ` <span class="tab-notification">${promotableCount}</span>` : '';
+
+            if (employeesTabBtn) {
+                employeesTabBtn.innerHTML = `👷 Employees${empBadge}${promotionIndicator}`;
+            }
+            if (employeesBottomNav) {
+                const label = employeesBottomNav.querySelector('.label');
+                if (label) {
+                    let badgeHTML = employeeCount > 0 ? ` <span class="nav-badge">${employeeCount}</span>` : '';
+                    if (promotableCount > 0) {
+                        badgeHTML += ` <span class="nav-notification">${promotableCount}</span>`;
+                    }
+                    label.innerHTML = `Team${badgeHTML}`;
+                }
+            }
         }
     },
 
@@ -800,11 +863,12 @@ const UI = {
         upgradeTree.innerHTML = '';
 
         // Create sections for each upgrade path
-        const paths = ['speed', 'service', 'eco'];
+        const paths = ['speed', 'service', 'eco', 'operations'];
         const pathNames = {
             speed: 'Speed Path',
             service: 'Customer Service Path',
-            eco: 'Eco-Friendly Path'
+            eco: 'Eco-Friendly Path',
+            operations: 'Operations Automation'
         };
 
         paths.forEach(path => {
@@ -834,6 +898,39 @@ const UI = {
                     });
                 }
 
+                // Add automation toggle for operations upgrades (if owned)
+                let automationToggleHTML = '';
+                if (owned && path === 'operations') {
+                    let toggleSetting = null;
+                    let toggleLabel = '';
+
+                    // Determine which toggle to show based on upgrade effects
+                    if (upgrade.effects.autoHire) {
+                        toggleSetting = 'autoHireEnabled';
+                        toggleLabel = 'Auto-Hire';
+                    } else if (upgrade.effects.autoPromote) {
+                        toggleSetting = 'autoPromoteEnabled';
+                        toggleLabel = 'Auto-Promote';
+                    } else if (upgrade.effects.autoAssign) {
+                        toggleSetting = 'autoAssignEnabled';
+                        toggleLabel = 'Auto-Assign';
+                    }
+
+                    if (toggleSetting) {
+                        const isEnabled = state.automationSettings[toggleSetting];
+                        automationToggleHTML = `
+                            <div class="automation-toggle">
+                                <label class="toggle-label">
+                                    <input type="checkbox"
+                                           data-automation-toggle="${toggleSetting}"
+                                           ${isEnabled ? 'checked' : ''}>
+                                    <span class="toggle-text">${toggleLabel}: ${isEnabled ? 'ON' : 'OFF'}</span>
+                                </label>
+                            </div>
+                        `;
+                    }
+                }
+
                 upgradeCard.innerHTML = `
                     <div class="upgrade-header">
                         <div class="upgrade-name">${upgrade.name} ${owned ? '✓' : ''}</div>
@@ -841,6 +938,7 @@ const UI = {
                     </div>
                     <div class="upgrade-description">${upgrade.description}</div>
                     <div class="upgrade-effects">${effectsHTML}</div>
+                    ${automationToggleHTML}
                     ${!owned ? `
                         <div class="upgrade-footer">
                             <span class="upgrade-cost ${canAfford ? 'positive' : 'negative'}">${Game.formatMoney(upgrade.cost)}</span>
@@ -867,6 +965,37 @@ const UI = {
                 const success = Game.purchaseUpgrade(upgradeId);
                 if (success) {
                     this.update();
+                }
+            });
+        });
+
+        // Add event listeners to automation toggle checkboxes
+        const toggleCheckboxes = upgradeTree.querySelectorAll('input[data-automation-toggle]');
+        toggleCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', (e) => {
+                const setting = e.target.dataset.automationToggle;
+                const isEnabled = e.target.checked;
+
+                // Update game state
+                const state = Game.getState();
+                if (state.automationSettings) {
+                    state.automationSettings[setting] = isEnabled;
+
+                    // Log the change
+                    const settingNames = {
+                        autoAssignEnabled: 'Auto-Assign',
+                        autoPromoteEnabled: 'Auto-Promote',
+                        autoHireEnabled: 'Auto-Hire'
+                    };
+                    Game.logAction(`⚙️ ${settingNames[setting]} ${isEnabled ? 'enabled' : 'disabled'}`);
+
+                    // Update UI
+                    this.update();
+
+                    // Save game state
+                    if (window.StorageManager) {
+                        StorageManager.autoSave(state);
+                    }
                 }
             });
         });
@@ -980,11 +1109,27 @@ const UI = {
                         <p>Purchase equipment and upgrades to improve your operations:</p>
                         <ul>
                             <li><strong>Equipment:</strong> One-time purchases that boost job quality and satisfaction</li>
-                            <li><strong>Upgrades:</strong> Three paths (Speed, Service, Eco-Friendly) with tier progression</li>
-                            <li>Service Path increases revenue and satisfaction bonuses</li>
-                            <li>Eco Path provides bonuses for Eco-Focused clients</li>
+                            <li><strong>Upgrade Paths:</strong> Four paths with tier progression</li>
+                            <li><strong>Speed Path:</strong> Faster job completion for speed-focused clients</li>
+                            <li><strong>Service Path:</strong> Increases revenue and satisfaction bonuses</li>
+                            <li><strong>Eco Path:</strong> Bonuses for Eco-Focused clients</li>
+                            <li><strong>Operations Path:</strong> Automates tedious management tasks (see below)</li>
                             <li>Upgrades become essential in mid-to-late game for maintaining large client bases</li>
                             <li>Unlocks require prerequisites and progress through tiers</li>
+                        </ul>
+                    </section>
+
+                    <section class="help-section">
+                        <h3>🤖 Operations Automation</h3>
+                        <p>The Operations upgrade path reduces micromanagement as your business grows:</p>
+                        <ul>
+                            <li><strong>Tier 1 - Auto-Assign ($2,000):</strong> Automatically assigns available employees to unserviced clients</li>
+                            <li><strong>Tier 2 - Smart Scheduling ($5,000):</strong> Optimizes assignments by matching employee skill to client difficulty</li>
+                            <li><strong>Tier 3 - Promotion Manager ($8,000):</strong> Auto-promotes eligible employees when funds are available</li>
+                            <li><strong>Tier 4 - Full Automation ($15,000):</strong> Auto-hires employees when needed and funds permit</li>
+                            <li>Each automation feature has a toggle switch - you stay in control</li>
+                            <li>Cash buffers prevent automation from bankrupting you ($3k for hire, $2k for promote)</li>
+                            <li>All automation actions are logged so you can see what happened</li>
                         </ul>
                     </section>
 

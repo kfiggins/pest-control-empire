@@ -35,6 +35,15 @@ const Game = {
         // Settings
         settings: {
             difficulty: 'normal'
+        },
+
+        // Automation settings (controlled by upgrades and user toggles)
+        automationSettings: {
+            autoAssignEnabled: true,  // Toggle for auto-assign (requires OPS_1 upgrade)
+            autoPromoteEnabled: true, // Toggle for auto-promote (requires OPS_3 upgrade)
+            autoHireEnabled: true,    // Toggle for auto-hire (requires OPS_4 upgrade)
+            autoHireCashBuffer: 3000, // Don't auto-hire if cash would drop below this
+            autoPromoteCashBuffer: 2000 // Don't auto-promote if cash would drop below this
         }
     },
 
@@ -76,6 +85,11 @@ const Game = {
 
         // Reset weekly tracking
         this.resetWeeklyStats();
+
+        // Phase -1: Automation (run before jobs are processed)
+        this.autoHireEmployees();    // Hire first if needed
+        this.autoPromoteEmployees(); // Promote next
+        this.autoAssignClients();    // Then assign to clients
 
         // Phase 0: Process jobs (employees service clients)
         this.processJobs();
@@ -257,6 +271,166 @@ const Game = {
         }
     },
 
+    // === AUTOMATION FUNCTIONS ===
+
+    // Auto-assign available employees to unserviced clients
+    autoAssignClients() {
+        const upgradeEffects = EquipmentManager.calculateUpgradeEffects(this.state.ownedUpgrades);
+
+        // Check if auto-assign is enabled (upgrade + user setting)
+        if (!upgradeEffects.autoAssign || !this.state.automationSettings.autoAssignEnabled) {
+            return;
+        }
+
+        // Find unserviced clients
+        const unservicedClients = this.state.clients.filter(client => {
+            const assignedEmployees = this.state.employees.filter(emp =>
+                emp.assignedClients.includes(client.id)
+            );
+            return assignedEmployees.length === 0;
+        });
+
+        if (unservicedClients.length === 0) {
+            return;
+        }
+
+        // Find available employees (those with capacity for more clients)
+        const availableEmployees = this.state.employees.filter(emp =>
+            emp.assignedClients.length < emp.maxClients
+        );
+
+        if (availableEmployees.length === 0) {
+            return;
+        }
+
+        let assignedCount = 0;
+
+        // Use smart matching if available (OPS_2+)
+        if (upgradeEffects.smartMatching) {
+            // Sort clients by difficulty (Commercial > Eco > Speed > Residential)
+            const clientDifficulty = { 'COMMERCIAL': 3, 'ECO_FOCUSED': 2, 'SPEED_FOCUSED': 1, 'RESIDENTIAL': 0 };
+            unservicedClients.sort((a, b) =>
+                (clientDifficulty[b.type] || 0) - (clientDifficulty[a.type] || 0)
+            );
+
+            // Sort employees by skill level (Expert > Experienced > Junior > Trainee)
+            const skillRanking = { 'EXPERT': 3, 'EXPERIENCED': 2, 'JUNIOR': 1, 'TRAINEE': 0 };
+            availableEmployees.sort((a, b) =>
+                (skillRanking[b.skillLevel] || 0) - (skillRanking[a.skillLevel] || 0)
+            );
+
+            // Match hardest clients to best employees
+            for (const client of unservicedClients) {
+                const employee = availableEmployees.find(emp =>
+                    emp.assignedClients.length < emp.maxClients
+                );
+
+                if (employee) {
+                    employee.assignedClients.push(client.id);
+                    assignedCount++;
+                    this.logAction(`🤖 Auto-assigned ${employee.name} to ${client.name}`);
+                }
+            }
+        } else {
+            // Simple assignment: first available employee
+            for (const client of unservicedClients) {
+                const employee = availableEmployees.find(emp =>
+                    emp.assignedClients.length < emp.maxClients
+                );
+
+                if (employee) {
+                    employee.assignedClients.push(client.id);
+                    assignedCount++;
+                    this.logAction(`🤖 Auto-assigned ${employee.name} to ${client.name}`);
+                }
+            }
+        }
+
+        if (assignedCount > 0) {
+            console.log(`🤖 Auto-assigned ${assignedCount} client(s)`);
+        }
+    },
+
+    // Auto-promote eligible employees
+    autoPromoteEmployees() {
+        const upgradeEffects = EquipmentManager.calculateUpgradeEffects(this.state.ownedUpgrades);
+
+        // Check if auto-promote is enabled (upgrade + user setting)
+        if (!upgradeEffects.autoPromote || !this.state.automationSettings.autoPromoteEnabled) {
+            return;
+        }
+
+        const cashBuffer = this.state.automationSettings.autoPromoteCashBuffer;
+        let promotedCount = 0;
+
+        for (const employee of this.state.employees) {
+            // Get promotion info
+            const promotionInfo = EmployeeManager.getPromotionInfo(employee);
+
+            // Skip if not eligible or at max level
+            if (!promotionInfo || !promotionInfo.canPromote) {
+                continue;
+            }
+
+            // Check if we have enough cash (with buffer)
+            if (this.state.money >= promotionInfo.cost + cashBuffer) {
+                // Use existing promoteEmployee method (it handles all the logic)
+                const success = this.promoteEmployee(employee.id);
+
+                if (success) {
+                    promotedCount++;
+                    // Override the log message to show it was automated
+                    this.logAction(`🤖 Auto-promoted ${employee.name} to ${employee.skillData.name}`);
+                }
+            }
+        }
+
+        if (promotedCount > 0) {
+            console.log(`🤖 Auto-promoted ${promotedCount} employee(s)`);
+        }
+    },
+
+    // Auto-hire employees when needed
+    autoHireEmployees() {
+        const upgradeEffects = EquipmentManager.calculateUpgradeEffects(this.state.ownedUpgrades);
+
+        // Check if auto-hire is enabled (upgrade + user setting)
+        if (!upgradeEffects.autoHire || !this.state.automationSettings.autoHireEnabled) {
+            return;
+        }
+
+        // Check if there are unserviced clients
+        const unservicedClients = this.state.clients.filter(client => {
+            const assignedEmployees = this.state.employees.filter(emp =>
+                emp.assignedClients.includes(client.id)
+            );
+            return assignedEmployees.length === 0;
+        });
+
+        // Check if existing employees have capacity
+        const hasCapacity = this.state.employees.some(emp =>
+            emp.assignedClients.length < emp.maxClients
+        );
+
+        // Only hire if there are unserviced clients and no capacity
+        if (unservicedClients.length === 0 || hasCapacity) {
+            return;
+        }
+
+        const cashBuffer = this.state.automationSettings.autoHireCashBuffer;
+
+        // Try to hire a Junior employee (good balance of cost and capability)
+        const hireCost = EmployeeManager.getHireCost('JUNIOR');
+
+        if (this.state.money >= hireCost + cashBuffer) {
+            const success = this.hireEmployee('JUNIOR');
+            if (success) {
+                this.logAction(`🤖 Auto-hired new employee`);
+                console.log(`🤖 Auto-hired employee`);
+            }
+        }
+    },
+
     // Update overall game state after turn
     updateGameState() {
         // Update client satisfaction
@@ -429,6 +603,13 @@ const Game = {
             gameOverReason: null,
             settings: {
                 difficulty: 'normal'
+            },
+            automationSettings: {
+                autoAssignEnabled: true,
+                autoPromoteEnabled: true,
+                autoHireEnabled: true,
+                autoHireCashBuffer: 3000,
+                autoPromoteCashBuffer: 2000
             }
         };
 

@@ -165,6 +165,47 @@ const EquipmentManager = {
             effects: { ecoClientBonus: 35, satisfactionBonus: 6, revenueBonus: 0.10 },
             tier: 3,
             requires: 'ECO_2'
+        },
+
+        // Operations Automation Path
+        OPS_1: {
+            id: 'OPS_1',
+            name: 'Auto-Assign System',
+            description: 'Automatically assigns available employees to unserviced clients each turn',
+            cost: 2000,
+            path: 'operations',
+            effects: { autoAssign: true },
+            tier: 1
+        },
+        OPS_2: {
+            id: 'OPS_2',
+            name: 'Smart Scheduling',
+            description: 'Optimizes employee-client matching based on skill level and client difficulty',
+            cost: 5000,
+            path: 'operations',
+            effects: { autoAssign: true, smartMatching: true },
+            tier: 2,
+            requires: 'OPS_1'
+        },
+        OPS_3: {
+            id: 'OPS_3',
+            name: 'Promotion Manager',
+            description: 'Automatically promotes eligible employees when you have sufficient funds',
+            cost: 8000,
+            path: 'operations',
+            effects: { autoAssign: true, smartMatching: true, autoPromote: true },
+            tier: 3,
+            requires: 'OPS_2'
+        },
+        OPS_4: {
+            id: 'OPS_4',
+            name: 'Full Business Automation',
+            description: 'Auto-hire employees when needed and funds are available',
+            cost: 15000,
+            path: 'operations',
+            effects: { autoAssign: true, smartMatching: true, autoPromote: true, autoHire: true },
+            tier: 4,
+            requires: 'OPS_3'
         }
     },
 
@@ -231,14 +272,23 @@ const EquipmentManager = {
             satisfactionBonus: 0,
             revenueBonus: 0,
             ecoClientBonus: 0,
-            speedClientBonus: 0
+            speedClientBonus: 0,
+            autoAssign: false,
+            smartMatching: false,
+            autoPromote: false,
+            autoHire: false
         };
 
         ownedUpgrades.forEach(upgradeId => {
             const upgrade = this.upgrades[upgradeId];
             if (upgrade && upgrade.effects) {
                 Object.keys(upgrade.effects).forEach(key => {
-                    effects[key] = (effects[key] || 0) + upgrade.effects[key];
+                    // For boolean effects, use OR logic
+                    if (typeof upgrade.effects[key] === 'boolean') {
+                        effects[key] = effects[key] || upgrade.effects[key];
+                    } else {
+                        effects[key] = (effects[key] || 0) + upgrade.effects[key];
+                    }
                 });
             }
         });
