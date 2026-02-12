@@ -178,9 +178,10 @@ const ClientManager = {
 
     // Update client satisfaction
     updateSatisfaction(client) {
-        // If serviced this week, restore satisfaction
+        // Apply satisfaction decay
         if (client.serviced) {
-            client.satisfaction = Math.min(100, client.satisfaction + 15);
+            // Serviced clients: normal decay (satisfaction was already increased by employee)
+            client.satisfaction -= client.typeData.satisfactionDecay;
             client.serviced = false;
         } else {
             // Unserviced clients get double decay penalty
