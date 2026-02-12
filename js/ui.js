@@ -507,8 +507,15 @@ const UI = {
             return '<p class="assignment-hint">At full capacity</p>';
         }
 
-        // Filter out already assigned clients
-        const availableClients = clients.filter(c => !employee.assignedClients.includes(c.id));
+        // Get all assigned client IDs from ALL employees
+        const state = Game.getState();
+        const allAssignedClientIds = new Set();
+        state.employees.forEach(emp => {
+            emp.assignedClients.forEach(clientId => allAssignedClientIds.add(clientId));
+        });
+
+        // Filter out clients that are assigned to ANY employee
+        const availableClients = clients.filter(c => !allAssignedClientIds.has(c.id));
 
         if (availableClients.length === 0) {
             return '<p class="assignment-hint">All clients already assigned</p>';
