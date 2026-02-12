@@ -511,6 +511,15 @@ const Game = {
         const multiplier = this.getClientAcquisitionMultiplier();
         const cost = Math.floor(baseCost * multiplier);
 
+        // DEBUG LOGGING
+        console.log('🔍 ACQUIRE CLIENT DEBUG:');
+        console.log('  Client type:', client.type);
+        console.log('  Base cost:', baseCost);
+        console.log('  Multiplier:', multiplier);
+        console.log('  Final cost:', cost);
+        console.log('  Money BEFORE:', this.state.money);
+        console.log('  Clients acquired so far:', this.state.stats.clientsAcquired);
+
         // Check if we can afford it
         if (this.state.money < cost) {
             this.logAction(`❌ Cannot acquire ${client.name} - insufficient funds (need ${this.formatMoney(cost)})`);
@@ -519,6 +528,9 @@ const Game = {
 
         // Deduct cost
         this.state.money -= cost;
+
+        console.log('  Money AFTER deduction:', this.state.money);
+        console.log('  Expected money:', 3000 - cost);
 
         // Add client
         this.state.clients.push(client);
