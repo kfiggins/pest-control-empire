@@ -721,7 +721,8 @@ body.modal-open {
     border-radius: var(--border-radius);
     font-size: 0.85rem;
     color: var(--color-text-muted);
-    margin-top: var(--spacing-sm);
+    margin-top: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
     line-height: 1.4;
 }
 
@@ -982,6 +983,13 @@ body.modal-open {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-sm);
+}
+
+.equipment-footer .btn-small {
+    margin: 0;
+    min-width: 100px;
 }
 
 .equipment-cost {
@@ -1081,6 +1089,13 @@ body.modal-open {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-sm);
+}
+
+.upgrade-footer .btn-small {
+    margin: 0;
+    min-width: 100px;
 }
 
 .upgrade-cost {

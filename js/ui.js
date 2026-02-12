@@ -933,7 +933,12 @@ const UI = {
                 <div class="help-body">
                     <section class="help-section">
                         <h3>🎯 Goal</h3>
-                        <p>Build a successful pest control empire! Reach <strong>$75,000 profit</strong> with <strong>12+ clients</strong> and <strong>6+ employees</strong> to win.</p>
+                        <p>Build a successful pest control empire! Reach <strong>$25,000 weekly profit</strong> with <strong>12+ clients</strong> and <strong>6+ employees</strong> to win.</p>
+                    </section>
+
+                    <section class="help-section">
+                        <h3>🏁 Starting the Game</h3>
+                        <p>You begin as the <strong>owner</strong> with Junior-level skills and <strong>$2,000</strong> in starting capital. You can service up to 3 clients per week on your own.</p>
                     </section>
 
                     <section class="help-section">
@@ -943,25 +948,30 @@ const UI = {
 
                     <section class="help-section">
                         <h3>👥 Clients</h3>
-                        <p><strong>Cost:</strong> $200-$600 to acquire</p>
-                        <p><strong>Revenue:</strong> $150-$400/week when serviced</p>
-                        <p><strong>Satisfaction:</strong> Starts at 85-95%, decays over time</p>
+                        <p><strong>Base Cost:</strong> $350-$1,000 to acquire (varies by type)</p>
+                        <p><strong>⚠️ Important:</strong> Acquisition costs increase exponentially (1.3x multiplier per client acquired)</p>
+                        <p><strong>Revenue:</strong> $255-$680/week when serviced</p>
+                        <p><strong>Satisfaction:</strong> Starts at 85-95%, decays 5-9 points/week depending on type</p>
                         <ul>
+                            <li><strong>Types:</strong> Residential (easiest), Speed-Focused, Eco-Focused, Commercial (hardest)</li>
                             <li>Serviced clients generate full revenue and gain satisfaction</li>
                             <li>Unserviced clients generate NO revenue and lose satisfaction faster</li>
-                            <li>Clients leave if satisfaction drops too low</li>
+                            <li>Clients leave if satisfaction drops below 20%</li>
+                            <li><strong>Referrals:</strong> Clients with 80+ satisfaction have 15% chance to refer a free client each week</li>
                         </ul>
                     </section>
 
                     <section class="help-section">
                         <h3>🚚 Employees</h3>
                         <p><strong>Cost:</strong> $1,800-$3,500 (includes truck)</p>
-                        <p><strong>Salary:</strong> $400-$800/week</p>
-                        <p><strong>Capacity:</strong> Can service 1-3 clients per week</p>
+                        <p><strong>Salary:</strong> $500-$1,500/week (based on skill level)</p>
+                        <p><strong>Capacity:</strong> Can service 2-5 clients per week (based on skill)</p>
+                        <p><strong>Skill Levels:</strong> Trainee, Junior, Experienced, Expert</p>
                         <ul>
                             <li>Assign employees to clients to service them</li>
-                            <li>Employee skill affects client satisfaction</li>
-                            <li>Better employees cost more but perform better</li>
+                            <li>Employee skill level significantly affects client satisfaction restoration</li>
+                            <li>Better employees cost more but perform better (essential for harder client types)</li>
+                            <li><strong>Tip:</strong> Match employee skill to client difficulty (e.g., Expert for Commercial)</li>
                         </ul>
                     </section>
 
@@ -969,8 +979,11 @@ const UI = {
                         <h3>🔧 Equipment & Upgrades</h3>
                         <p>Purchase equipment and upgrades to improve your operations:</p>
                         <ul>
-                            <li><strong>Equipment:</strong> One-time purchases that boost job quality</li>
-                            <li><strong>Upgrades:</strong> Three paths (Speed, Service, Eco-Friendly)</li>
+                            <li><strong>Equipment:</strong> One-time purchases that boost job quality and satisfaction</li>
+                            <li><strong>Upgrades:</strong> Three paths (Speed, Service, Eco-Friendly) with tier progression</li>
+                            <li>Service Path increases revenue and satisfaction bonuses</li>
+                            <li>Eco Path provides bonuses for Eco-Focused clients</li>
+                            <li>Upgrades become essential in mid-to-late game for maintaining large client bases</li>
                             <li>Unlocks require prerequisites and progress through tiers</li>
                         </ul>
                     </section>
@@ -979,19 +992,22 @@ const UI = {
                         <h3>🎲 Events</h3>
                         <p>Random events occur each turn:</p>
                         <ul>
-                            <li><strong>Positive:</strong> New clients, equipment deals, bonuses</li>
-                            <li><strong>Negative:</strong> Pest surges, breakdowns, competition</li>
+                            <li><strong>Positive:</strong> New client referrals, equipment deals, cash bonuses</li>
+                            <li><strong>Negative:</strong> Pest surges, equipment breakdowns, competitor actions, regulation fines</li>
                             <li>Some events are more likely in certain seasons</li>
+                            <li>Negative events can significantly impact your finances - keep a cash buffer</li>
                         </ul>
                     </section>
 
                     <section class="help-section">
-                        <h3>💡 Tips</h3>
+                        <h3>💡 Strategy Tips</h3>
                         <ul>
-                            <li>Start by acquiring 2-3 clients, then hire an employee</li>
-                            <li>Always keep clients serviced to maintain satisfaction</li>
-                            <li>Watch your cash flow - don't hire too many employees too fast</li>
-                            <li>Buy equipment early to improve employee performance</li>
+                            <li>Start by acquiring 1-2 clients with your owner skills</li>
+                            <li>Client costs increase exponentially - rely on referrals for growth in mid-game</li>
+                            <li>Keep satisfaction above 80% to trigger referrals (free clients!)</li>
+                            <li>Match employee skill level to client difficulty to avoid satisfaction losses</li>
+                            <li>Watch your cash flow - weekly overhead ($300) starts at Week 5</li>
+                            <li>Invest in equipment and upgrades early - they're essential, not optional</li>
                             <li>Diversify client types for stable revenue</li>
                             <li>Game auto-saves after each turn</li>
                         </ul>
@@ -1000,7 +1016,8 @@ const UI = {
                     <section class="help-section">
                         <h3>💀 Game Over</h3>
                         <p><strong>Bankruptcy:</strong> Cash drops below $0</p>
-                        <p><strong>Victory:</strong> $75,000 profit + 12 clients + 6 employees</p>
+                        <p><strong>Victory:</strong> $25,000 weekly profit + 12 clients + 6 employees</p>
+                        <p><strong>Expected Completion:</strong> 40-60+ weeks with good strategy</p>
                     </section>
                 </div>
                 <div class="help-footer">
