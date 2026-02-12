@@ -7,7 +7,7 @@ const Game = {
     // Game State
     state: {
         week: 1,
-        money: 3000,
+        money: 2000,
         clients: [],
         employees: [],
         trucks: [],
@@ -406,7 +406,7 @@ const Game = {
         // Reset state
         this.state = {
             week: 1,
-            money: 5000,
+            money: 2000,
             clients: [],
             employees: [],
             trucks: [],
@@ -429,6 +429,16 @@ const Game = {
             }
         };
 
+        // Create starting employee (the owner - Junior level)
+        const owner = EmployeeManager.generateEmployee('JUNIOR');
+        owner.name = 'You (Owner)'; // Special name for the owner
+        const ownerTruck = EmployeeManager.generateTruck();
+        ownerTruck.assignedEmployee = owner.id;
+        owner.truckId = ownerTruck.id;
+
+        this.state.employees.push(owner);
+        this.state.trucks.push(ownerTruck);
+
         // Re-enable turn button
         const nextWeekBtn = document.getElementById('next-week-btn');
         if (nextWeekBtn) {
@@ -439,7 +449,7 @@ const Game = {
         // Clear and reset action log
         if (window.UI && UI.clearLog) {
             UI.clearLog();
-            this.logAction('New game started! Build your pest control empire.');
+            this.logAction('🏢 Welcome to your new pest control business! You start with $2,000 and your skills.');
         }
 
         // Refresh UI
