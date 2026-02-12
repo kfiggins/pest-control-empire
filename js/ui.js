@@ -181,12 +181,27 @@ const UI = {
         const costMultiplier = Game.getClientAcquisitionMultiplier();
         const minCost = Math.floor(350 * costMultiplier); // Residential base
         const maxCost = Math.floor(1000 * costMultiplier); // Commercial base
-        const clientCostInfo = document.querySelector('#acquire-client-btn + .action-info p:first-child');
-        if (clientCostInfo) {
-            if (costMultiplier > 1.2) {
-                clientCostInfo.innerHTML = `Cost: ${Game.formatMoney(minCost)} - ${Game.formatMoney(maxCost)} <span style="color: var(--color-accent);">(+${Math.round((costMultiplier - 1) * 100)}%)</span>`;
-            } else {
-                clientCostInfo.textContent = `Cost: ${Game.formatMoney(minCost)} - ${Game.formatMoney(maxCost)}`;
+
+        // Hide acquire client section when costs become prohibitively expensive (10x multiplier)
+        const acquireClientBtn = document.getElementById('acquire-client-btn');
+        const acquireClientInfo = document.querySelector('#acquire-client-btn + .action-info');
+
+        if (costMultiplier >= 10) {
+            // Hide button and info when too expensive
+            if (acquireClientBtn) acquireClientBtn.style.display = 'none';
+            if (acquireClientInfo) acquireClientInfo.style.display = 'none';
+        } else {
+            // Show button and update cost display
+            if (acquireClientBtn) acquireClientBtn.style.display = 'block';
+            if (acquireClientInfo) acquireClientInfo.style.display = 'block';
+
+            const clientCostInfo = acquireClientInfo?.querySelector('p:first-child');
+            if (clientCostInfo) {
+                if (costMultiplier > 1.2) {
+                    clientCostInfo.innerHTML = `Cost: ${Game.formatMoney(minCost)} - ${Game.formatMoney(maxCost)} <span style="color: var(--color-accent);">(+${Math.round((costMultiplier - 1) * 100)}%)</span>`;
+                } else {
+                    clientCostInfo.textContent = `Cost: ${Game.formatMoney(minCost)} - ${Game.formatMoney(maxCost)}`;
+                }
             }
         }
 

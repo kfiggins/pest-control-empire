@@ -144,7 +144,7 @@ const Game = {
     // Process client referrals (happy clients refer new clients)
     processReferrals() {
         const REFERRAL_SATISFACTION_THRESHOLD = 80;
-        const REFERRAL_CHANCE = 0.15; // 15% chance per week if satisfied
+        const REFERRAL_CHANCE = 0.03; // 3% chance per week if satisfied
 
         let referralsThisWeek = 0;
 

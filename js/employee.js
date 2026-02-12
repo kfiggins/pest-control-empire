@@ -25,7 +25,7 @@ const EmployeeManager = {
             hireCost: 800,
             weeklySalary: 500,
             color: '#94a3b8',
-            satisfactionBonus: 3,
+            satisfactionBonus: 1,
             maxClients: 2
         },
         JUNIOR: {
@@ -34,7 +34,7 @@ const EmployeeManager = {
             hireCost: 1200,
             weeklySalary: 750,
             color: '#60a5fa',
-            satisfactionBonus: 5,
+            satisfactionBonus: 2,
             maxClients: 3
         },
         EXPERIENCED: {
@@ -43,7 +43,7 @@ const EmployeeManager = {
             hireCost: 1800,
             weeklySalary: 1125,
             color: '#34d399',
-            satisfactionBonus: 7,
+            satisfactionBonus: 4,
             maxClients: 4
         },
         EXPERT: {
@@ -52,7 +52,7 @@ const EmployeeManager = {
             hireCost: 2500,
             weeklySalary: 1500,
             color: '#a78bfa',
-            satisfactionBonus: 9,
+            satisfactionBonus: 6,
             maxClients: 5
         }
     },
