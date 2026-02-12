@@ -615,6 +615,47 @@ const Game = {
 
         console.log(`⬆️ New upgrade: ${upgrade.name}`, upgrade);
         return true;
+    },
+
+    // Promote employee to next skill level
+    promoteEmployee(employeeId) {
+        const employee = this.state.employees.find(emp => emp.id === employeeId);
+
+        if (!employee) {
+            return false;
+        }
+
+        // Get promotion info
+        const promotionInfo = EmployeeManager.getPromotionInfo(employee);
+
+        // VALIDATION: Check if promotable
+        if (!promotionInfo || !promotionInfo.canPromote) {
+            this.logAction(`❌ ${employee.name} is not ready for promotion`);
+            return false;
+        }
+
+        // VALIDATION: Check affordability
+        if (this.state.money < promotionInfo.cost) {
+            this.logAction(`❌ Cannot afford promotion (${this.formatMoney(promotionInfo.cost)})`);
+            return false;
+        }
+
+        // DEDUCTION: Subtract cost
+        this.state.money -= promotionInfo.cost;
+
+        // UPDATE: Promote employee
+        const oldSkill = employee.skillLevel;
+        employee.skillLevel = promotionInfo.nextLevel;
+        employee.skillData = EmployeeManager.skillLevels[promotionInfo.nextLevel];
+        employee.salary = employee.skillData.weeklySalary;
+        employee.maxClients = employee.skillData.maxClients;
+        employee.xp = 0; // Reset XP
+
+        // LOG: Success message
+        this.logAction(`⭐ ${employee.name} promoted from ${oldSkill} to ${promotionInfo.nextLevel}!`);
+
+        console.log(`⭐ Employee promoted: ${employee.name}`, { from: oldSkill, to: promotionInfo.nextLevel });
+        return true;
     }
 };
 

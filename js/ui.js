@@ -477,6 +477,7 @@ const UI = {
                             ${employee.weeksEmployed}
                         </span>
                     </div>
+                    ${this.renderXPProgress(employee)}
                 </div>
                 <div class="assigned-clients-section">
                     <span class="employee-stat-label">Assigned Clients:</span>
@@ -485,6 +486,7 @@ const UI = {
                 <div class="employee-actions">
                     ${this.renderEmployeeAssignmentControls(employee, state.clients)}
                 </div>
+                ${this.renderPromotionButton(employee, state)}
             `;
 
             employeeList.appendChild(employeeCard);
@@ -526,6 +528,51 @@ const UI = {
         return html;
     },
 
+    // Render XP progress for employee
+    renderXPProgress(employee) {
+        const promotionInfo = EmployeeManager.getPromotionInfo(employee);
+
+        // Don't show XP for max level employees
+        if (!promotionInfo) {
+            return '';
+        }
+
+        const xp = employee.xp || 0;
+        const xpProgress = Math.min(100, (xp / promotionInfo.xpRequired) * 100);
+
+        return `
+            <div class="employee-stat">
+                <span class="employee-stat-label">XP Progress:</span>
+                <div class="xp-progress-bar">
+                    <div class="xp-progress-fill" style="width: ${xpProgress}%"></div>
+                </div>
+                <span class="employee-stat-value">${xp} / ${promotionInfo.xpRequired}</span>
+            </div>
+        `;
+    },
+
+    // Render promotion button for employee
+    renderPromotionButton(employee, state) {
+        const promotionInfo = EmployeeManager.getPromotionInfo(employee);
+
+        // Don't show button if max level or not ready for promotion
+        if (!promotionInfo || !promotionInfo.canPromote) {
+            return '';
+        }
+
+        const canAfford = state.money >= promotionInfo.cost;
+
+        return `
+            <div class="promotion-section">
+                <button class="btn btn-small ${canAfford ? 'btn-primary' : 'btn-disabled'}"
+                        data-promote-id="${employee.id}"
+                        ${!canAfford ? 'disabled' : ''}>
+                    ⭐ Promote to ${promotionInfo.nextLevel} (${Game.formatMoney(promotionInfo.cost)})
+                </button>
+            </div>
+        `;
+    },
+
     // Set up event listeners for employee assignment controls
     setupEmployeeAssignmentListeners() {
         // Assign buttons
@@ -551,6 +598,18 @@ const UI = {
                 const clientId = e.target.dataset.clientId;
                 Game.unassignEmployee(employeeId, clientId);
                 this.update();
+            });
+        });
+
+        // Promotion buttons
+        const promoteButtons = document.querySelectorAll('button[data-promote-id]');
+        promoteButtons.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const employeeId = e.target.dataset.promoteId;
+                const success = Game.promoteEmployee(employeeId);
+                if (success) {
+                    this.update();
+                }
             });
         });
     },

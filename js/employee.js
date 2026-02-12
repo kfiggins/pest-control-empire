@@ -82,6 +82,7 @@ const EmployeeManager = {
             maxClients: skill.maxClients,
             weeksEmployed: 0,
             totalJobsCompleted: 0,
+            xp: 0, // Experience points for promotion
             truckId: null // Will be assigned when hired
         };
     },
@@ -164,6 +165,10 @@ const EmployeeManager = {
         // Track job
         employee.totalJobsCompleted++;
 
+        // Award XP for job completion
+        const XP_PER_JOB = 3;
+        employee.xp = (employee.xp || 0) + XP_PER_JOB;
+
         return {
             satisfactionGain: client.satisfaction - oldSatisfaction,
             success: true
@@ -220,6 +225,22 @@ const EmployeeManager = {
     // Unassign employee from all clients
     unassignAll(employee) {
         employee.assignedClients = [];
+    },
+
+    // Get promotion information for employee
+    getPromotionInfo(employee) {
+        const PROMOTION_THRESHOLDS = {
+            TRAINEE: { nextLevel: 'JUNIOR', xpRequired: 50, cost: 800 },
+            JUNIOR: { nextLevel: 'EXPERIENCED', xpRequired: 100, cost: 1200 },
+            EXPERIENCED: { nextLevel: 'EXPERT', xpRequired: 200, cost: 1500 },
+            EXPERT: null // Max level
+        };
+
+        const info = PROMOTION_THRESHOLDS[employee.skillLevel];
+        if (!info) return null;
+
+        const canPromote = (employee.xp || 0) >= info.xpRequired;
+        return { ...info, canPromote };
     }
 };
 

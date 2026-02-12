@@ -173,6 +173,33 @@
 
 ---
 
+### **Phase 8: Employee Progression & Promotion System** ⏱️ ~1 session
+**Goal**: Employees gain experience and can be promoted to higher skill levels
+
+**Why This Feature?**
+- Current system: Employees are hired at a skill level and never improve
+- Problem: No incentive to keep employees long-term vs constantly hiring/firing
+- Solution: Add XP system where employees naturally progress through skill tiers
+- Benefits: Adds strategic depth, rewards loyalty, makes `totalJobsCompleted` stat meaningful
+
+**Files**: Update `js/employee.js`, `js/game.js`, `js/ui.js`
+
+**Features**:
+- XP tracking per employee (gained from completing jobs)
+- Promotion system with thresholds:
+  - Trainee → Junior (50 XP / ~25 jobs)
+  - Junior → Experienced (100 XP / ~33 jobs)
+  - Experienced → Expert (200 XP / ~50 jobs)
+- Promotion costs money (training/certification fee)
+- Promotion UI (notification when eligible, promotion button)
+- Visual indicators for promotion progress
+- Auto-increment employee stats when promoted (salary, maxClients, multiplier, satisfactionBonus)
+- Balance: Make progression meaningful but not too fast/slow
+
+**Success Criteria**: Employees gain XP from jobs and can be promoted through skill tiers, creating long-term investment value
+
+---
+
 ## State Management Strategy
 
 ### Core Game State Object:
