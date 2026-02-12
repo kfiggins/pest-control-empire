@@ -112,16 +112,31 @@ const Game = {
     processRevenue() {
         // Process client revenue
         let clientRevenue = 0;
+        let servicedClients = 0;
+        let unservicedClients = 0;
 
         this.state.clients.forEach(client => {
-            const revenue = ClientManager.calculateRevenue(client);
+            // Check if client has an employee assigned
+            const hasEmployee = this.state.employees.some(emp => emp.assignedClients.includes(client.id));
+
+            const revenue = ClientManager.calculateRevenue(client, hasEmployee);
             clientRevenue += revenue;
             client.totalRevenue += revenue;
             client.weeksActive++;
+
+            if (hasEmployee) {
+                servicedClients++;
+            } else {
+                unservicedClients++;
+            }
         });
 
         if (clientRevenue > 0) {
-            this.logAction(`Client revenue: ${this.formatMoney(clientRevenue)} from ${this.state.clients.length} clients`);
+            this.logAction(`Client revenue: ${this.formatMoney(clientRevenue)} from ${servicedClients} serviced clients`);
+        }
+
+        if (unservicedClients > 0) {
+            this.logAction(`⚠️ ${unservicedClients} unserviced clients (no revenue, double satisfaction decay)`);
         }
 
         this.addRevenue(clientRevenue);

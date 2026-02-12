@@ -104,7 +104,12 @@ const ClientManager = {
     },
 
     // Calculate client revenue for the week
-    calculateRevenue(client) {
+    calculateRevenue(client, wasServiced = true) {
+        // Unserviced clients don't pay (no employee assigned)
+        if (!wasServiced) {
+            return 0;
+        }
+
         // Base revenue
         let revenue = client.baseRevenue;
 
@@ -123,13 +128,14 @@ const ClientManager = {
 
     // Update client satisfaction
     updateSatisfaction(client) {
-        // Decay satisfaction over time (in Phase 3, servicing will restore it)
-        client.satisfaction -= client.typeData.satisfactionDecay;
-
-        // If serviced this week, restore satisfaction (Phase 3)
+        // If serviced this week, restore satisfaction
         if (client.serviced) {
             client.satisfaction = Math.min(100, client.satisfaction + 15);
             client.serviced = false;
+        } else {
+            // Unserviced clients get double decay penalty
+            const decayAmount = client.typeData.satisfactionDecay * 2;
+            client.satisfaction -= decayAmount;
         }
 
         // Clamp between 0-100
