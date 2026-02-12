@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pest Empire Tycoon</title>
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+    <div class="game-container">
+        <!-- Header -->
+        <header class="game-header">
+            <h1>🐛 Pest Empire Tycoon</h1>
+            <div class="header-stats">
+                <div class="stat">
+                    <span class="stat-label">Week:</span>
+                    <span id="week-display" class="stat-value">1</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Cash:</span>
+                    <span id="money-display" class="stat-value">$5,000</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Game Area -->
+        <main class="game-main">
+            <!-- Left Sidebar - Info Panel -->
+            <aside class="sidebar sidebar-left">
+                <div class="panel">
+                    <h2>Business Overview</h2>
+                    <div class="info-section">
+                        <div class="info-item">
+                            <span class="info-label">Clients:</span>
+                            <span id="client-count" class="info-value">0</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Employees:</span>
+                            <span id="employee-count" class="info-value">0</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Trucks:</span>
+                            <span id="truck-count" class="info-value">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h2>Weekly Summary</h2>
+                    <div id="weekly-summary" class="info-section">
+                        <div class="info-item">
+                            <span class="info-label">Revenue:</span>
+                            <span id="weekly-revenue" class="info-value positive">$0</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Expenses:</span>
+                            <span id="weekly-expenses" class="info-value negative">$0</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Net:</span>
+                            <span id="weekly-net" class="info-value">$0</span>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Center Content Area -->
+            <section class="content-area">
+                <div class="panel">
+                    <h2>Action Center</h2>
+                    <div id="action-log" class="action-log">
+                        <p class="log-entry">Welcome to Pest Empire Tycoon! Build your pest control empire one week at a time.</p>
+                        <p class="log-entry">Click "Next Week" to advance time and see your business grow.</p>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h2>Statistics</h2>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-card-value" id="total-revenue">$0</div>
+                            <div class="stat-card-label">Total Revenue</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card-value" id="total-expenses">$0</div>
+                            <div class="stat-card-label">Total Expenses</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card-value" id="total-profit">$0</div>
+                            <div class="stat-card-label">Total Profit</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Right Sidebar - Controls -->
+            <aside class="sidebar sidebar-right">
+                <div class="panel">
+                    <h2>Turn Controls</h2>
+                    <button id="next-week-btn" class="btn btn-primary btn-large">
+                        Next Week →
+                    </button>
+                    <div class="turn-info">
+                        <p>Execute your planned actions and advance to the next week.</p>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h2>Game Menu</h2>
+                    <button id="new-game-btn" class="btn btn-secondary">New Game</button>
+                    <button id="save-game-btn" class="btn btn-secondary" disabled>Save Game</button>
+                    <button id="load-game-btn" class="btn btn-secondary" disabled>Load Game</button>
+                </div>
+            </aside>
+        </main>
+
+        <!-- Footer -->
+        <footer class="game-footer">
+            <p>Plan carefully. Build strategically. Dominate the pest control market.</p>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/game.js"></script>
+    <script src="js/ui.js"></script>
+    <script>
+        // Initialize game on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            Game.init();
+            UI.init();
+        });
+    </script>
+</body>
+</html>
