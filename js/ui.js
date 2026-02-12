@@ -17,6 +17,9 @@ const UI = {
         // Set up event listeners
         this.setupEventListeners();
 
+        // Setup tab navigation
+        this.setupTabNavigation();
+
         // Initial render
         this.update();
     },
@@ -97,6 +100,54 @@ const UI = {
         // Help button
         this.elements.helpBtn.addEventListener('click', () => {
             this.showHelpModal();
+        });
+    },
+
+    // Setup tab navigation
+    setupTabNavigation() {
+        // Desktop tab buttons
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const tabContainer = document.querySelector('.tab-content-container');
+
+        tabButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                const targetTab = e.target.dataset.tab;
+
+                // Remove active from all tabs
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                tabContents.forEach(content => content.classList.remove('active'));
+
+                // Add active to clicked tab
+                e.target.classList.add('active');
+                const targetContent = document.getElementById(`tab-${targetTab}`);
+                if (targetContent) {
+                    targetContent.classList.add('active');
+                }
+
+                // Scroll to top of new tab
+                if (tabContainer) {
+                    tabContainer.scrollTop = 0;
+                }
+            });
+        });
+
+        // Mobile bottom navigation
+        const bottomNavItems = document.querySelectorAll('.bottom-nav-item');
+        bottomNavItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                const targetTab = e.currentTarget.dataset.tab;
+
+                // Trigger desktop tab button click
+                const tabButton = document.querySelector(`.tab-button[data-tab="${targetTab}"]`);
+                if (tabButton) {
+                    tabButton.click();
+                }
+
+                // Update bottom nav active state
+                bottomNavItems.forEach(nav => nav.classList.remove('active'));
+                e.currentTarget.classList.add('active');
+            });
         });
     },
 
@@ -339,8 +390,10 @@ const UI = {
                 </div>
             `;
             eventNotification.style.display = 'flex';
+            document.body.classList.add('modal-open');
         } else {
             eventNotification.style.display = 'none';
+            document.body.classList.remove('modal-open');
         }
     },
 
@@ -352,6 +405,7 @@ const UI = {
         const eventNotification = document.getElementById('event-notification');
         if (eventNotification) {
             eventNotification.style.display = 'none';
+            document.body.classList.remove('modal-open');
         }
     },
 
@@ -848,6 +902,7 @@ const UI = {
         `;
 
         modal.style.display = 'flex';
+        document.body.classList.add('modal-open');
     },
 
     // Close game over modal
@@ -855,6 +910,7 @@ const UI = {
         const modal = document.getElementById('game-over-modal');
         if (modal) {
             modal.style.display = 'none';
+            document.body.classList.remove('modal-open');
         }
     },
 
@@ -954,6 +1010,7 @@ const UI = {
         `;
 
         modal.style.display = 'flex';
+        document.body.classList.add('modal-open');
     },
 
     // Close help modal
@@ -961,6 +1018,7 @@ const UI = {
         const modal = document.getElementById('help-modal');
         if (modal) {
             modal.style.display = 'none';
+            document.body.classList.remove('modal-open');
         }
     }
 };

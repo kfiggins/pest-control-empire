@@ -50,6 +50,9 @@ const Game = {
                 this.logAction(`Game loaded from ${StorageManager.getFormattedSaveTime()}`);
                 console.log('📂 Loaded saved game');
             }
+        } else {
+            // No saved game - start a new game
+            this.newGame();
         }
 
         this.resetWeeklyStats();

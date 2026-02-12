@@ -27,8 +27,8 @@
         <main class="game-main">
             <!-- Left Sidebar - Info Panel -->
             <aside class="sidebar sidebar-left">
-                <div class="panel">
-                    <h2>Business Overview</h2>
+                <details class="panel" open>
+                    <summary><h2>Business Overview</h2></summary>
                     <div class="info-section">
                         <div class="info-item">
                             <span class="info-label">Clients:</span>
@@ -43,10 +43,10 @@
                             <span id="truck-count" class="info-value">0</span>
                         </div>
                     </div>
-                </div>
+                </details>
 
-                <div class="panel">
-                    <h2>Weekly Summary</h2>
+                <details class="panel" open>
+                    <summary><h2>Weekly Summary</h2></summary>
                     <div id="weekly-summary" class="info-section">
                         <div class="info-item">
                             <span class="info-label">Revenue:</span>
@@ -61,84 +61,113 @@
                             <span id="weekly-net" class="info-value">$0</span>
                         </div>
                     </div>
-                </div>
+                </details>
             </aside>
 
             <!-- Center Content Area -->
             <section class="content-area">
-                <div class="panel">
-                    <h2>Client Portfolio</h2>
-                    <div id="client-list" class="client-list">
-                        <p class="empty-state">No clients yet. Acquire your first client to start generating revenue!</p>
-                    </div>
-                </div>
+                <!-- Tab Navigation -->
+                <nav class="tab-navigation">
+                    <button class="tab-button active" data-tab="clients">👥 Clients</button>
+                    <button class="tab-button" data-tab="employees">👷 Employees</button>
+                    <button class="tab-button" data-tab="equipment">🔧 Equipment</button>
+                    <button class="tab-button" data-tab="upgrades">⚡ Upgrades</button>
+                    <button class="tab-button" data-tab="stats">📊 Stats</button>
+                </nav>
 
-                <div class="panel">
-                    <h2>Employee Roster</h2>
-                    <div id="employee-list" class="employee-list">
-                        <p class="empty-state">No employees yet. Hire your first employee to service clients!</p>
-                    </div>
-                </div>
-
-                <div class="panel">
-                    <h2>Action Center</h2>
-                    <div id="action-log" class="action-log">
-                        <p class="log-entry">Welcome to Pest Empire Tycoon! Build your pest control empire one week at a time.</p>
-                        <p class="log-entry">Acquire clients to generate revenue and grow your business.</p>
-                    </div>
-                </div>
-
-                <div class="panel">
-                    <h2>Statistics</h2>
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-card-value" id="total-revenue">$0</div>
-                            <div class="stat-card-label">Total Revenue</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-card-value" id="total-expenses">$0</div>
-                            <div class="stat-card-label">Total Expenses</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-card-value" id="total-profit">$0</div>
-                            <div class="stat-card-label">Total Profit</div>
-                        </div>
-                    </div>
-
-                    <div class="victory-progress">
-                        <h3>Victory Progress</h3>
-                        <div class="progress-item">
-                            <span class="progress-label">Weekly Profit: <span id="victory-profit">$0 / $25,000</span></span>
-                            <div class="progress-bar">
-                                <div id="victory-profit-bar" class="progress-fill" style="width: 0%"></div>
-                            </div>
-                        </div>
-                        <div class="progress-item">
-                            <span class="progress-label">Clients: <span id="victory-clients">0 / 12</span></span>
-                            <div class="progress-bar">
-                                <div id="victory-clients-bar" class="progress-fill" style="width: 0%"></div>
-                            </div>
-                        </div>
-                        <div class="progress-item">
-                            <span class="progress-label">Employees: <span id="victory-employees">0 / 6</span></span>
-                            <div class="progress-bar">
-                                <div id="victory-employees-bar" class="progress-fill" style="width: 0%"></div>
+                <!-- Tab Content Container -->
+                <div class="tab-content-container">
+                    <!-- Clients Tab -->
+                    <div class="tab-content active" id="tab-clients">
+                        <div class="panel">
+                            <h2>Client Portfolio</h2>
+                            <div id="client-list" class="grid-list">
+                                <p class="empty-state">No clients yet. Acquire your first client to start generating revenue!</p>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="panel">
-                    <h2>Equipment Shop</h2>
-                    <div id="equipment-list" class="equipment-list">
-                        <p class="empty-state">No equipment available yet.</p>
+                    <!-- Employees Tab -->
+                    <div class="tab-content" id="tab-employees">
+                        <div class="panel">
+                            <h2>Employee Roster</h2>
+                            <div id="employee-list" class="grid-list">
+                                <p class="empty-state">No employees yet. Hire your first employee to service clients!</p>
+                            </div>
+                        </div>
                     </div>
-                </div>
 
-                <div class="panel">
-                    <h2>Upgrade Tree</h2>
-                    <div id="upgrade-tree" class="upgrade-tree">
-                        <p class="empty-state">Build your business to unlock upgrades.</p>
+                    <!-- Equipment Tab -->
+                    <div class="tab-content" id="tab-equipment">
+                        <div class="panel">
+                            <h2>Equipment Shop</h2>
+                            <div id="equipment-list">
+                                <p class="empty-state">No equipment available yet.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Upgrades Tab -->
+                    <div class="tab-content" id="tab-upgrades">
+                        <div class="panel">
+                            <h2>Upgrade Tree</h2>
+                            <div id="upgrade-tree">
+                                <p class="empty-state">Build your business to unlock upgrades.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Stats Tab -->
+                    <div class="tab-content" id="tab-stats">
+                        <div class="panel">
+                            <h2>Statistics</h2>
+                            <div class="stats-grid">
+                                <div class="stat-card">
+                                    <div class="stat-card-value" id="total-revenue">$0</div>
+                                    <div class="stat-card-label">Total Revenue</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-card-value" id="total-expenses">$0</div>
+                                    <div class="stat-card-label">Total Expenses</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-card-value" id="total-profit">$0</div>
+                                    <div class="stat-card-label">Total Profit</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="panel">
+                            <h2>Victory Progress</h2>
+                            <div class="victory-progress">
+                                <div class="progress-item">
+                                    <span class="progress-label">Weekly Profit: <span id="victory-profit">$0 / $25,000</span></span>
+                                    <div class="progress-bar">
+                                        <div id="victory-profit-bar" class="progress-fill" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                                <div class="progress-item">
+                                    <span class="progress-label">Clients: <span id="victory-clients">0 / 12</span></span>
+                                    <div class="progress-bar">
+                                        <div id="victory-clients-bar" class="progress-fill" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                                <div class="progress-item">
+                                    <span class="progress-label">Employees: <span id="victory-employees">0 / 6</span></span>
+                                    <div class="progress-bar">
+                                        <div id="victory-employees-bar" class="progress-fill" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="panel">
+                            <h2>Action Center</h2>
+                            <div id="action-log" class="action-log">
+                                <p class="log-entry">Welcome to Pest Empire Tycoon! Build your pest control empire one week at a time.</p>
+                                <p class="log-entry">Acquire clients to generate revenue and grow your business.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -190,14 +219,38 @@
         </footer>
     </div>
 
+    <!-- Mobile Bottom Navigation -->
+    <nav class="bottom-nav">
+        <button class="bottom-nav-item active" data-tab="clients">
+            <span class="icon">👥</span>
+            <span class="label">Clients</span>
+        </button>
+        <button class="bottom-nav-item" data-tab="employees">
+            <span class="icon">👷</span>
+            <span class="label">Team</span>
+        </button>
+        <button class="bottom-nav-item" data-tab="equipment">
+            <span class="icon">🔧</span>
+            <span class="label">Shop</span>
+        </button>
+        <button class="bottom-nav-item" data-tab="upgrades">
+            <span class="icon">⚡</span>
+            <span class="label">Upgrades</span>
+        </button>
+        <button class="bottom-nav-item" data-tab="stats">
+            <span class="icon">📊</span>
+            <span class="label">Stats</span>
+        </button>
+    </nav>
+
     <!-- Scripts - Increment ?v= when you make changes to force browser reload -->
-    <script src="js/client.js?v=1"></script>
-    <script src="js/employee.js?v=1"></script>
-    <script src="js/equipment.js?v=1"></script>
-    <script src="js/events.js?v=1"></script>
-    <script src="js/storage.js?v=1"></script>
-    <script src="js/game.js?v=1"></script>
-    <script src="js/ui.js?v=1"></script>
+    <script src="js/client.js?v=2"></script>
+    <script src="js/employee.js?v=2"></script>
+    <script src="js/equipment.js?v=2"></script>
+    <script src="js/events.js?v=2"></script>
+    <script src="js/storage.js?v=2"></script>
+    <script src="js/game.js?v=2"></script>
+    <script src="js/ui.js?v=2"></script>
     <script>
         // Initialize game on page load
         document.addEventListener('DOMContentLoaded', () => {
