@@ -200,6 +200,62 @@
 
 ---
 
+### **Phase 9: Game Balance Overhaul - Making It Challenging** ⏱️ ~1 session
+**Goal**: Rebalance the entire game to make it actually challenging and require strategic use of upgrades
+
+**Why This Feature?**
+- Current game: Too easy, can win without upgrades in 15-20 weeks
+- User feedback: "I didn't use any of the upgrades because it was way too easy"
+- Problem: No resource pressure, client retention trivial, upgrades optional
+- Solution: Comprehensive rebalancing to make upgrades essential for victory
+
+**Files**: Update `js/client.js`, `js/employee.js`, `js/game.js`, `js/equipment.js`, `js/events.js`, `js/ui.js`, `index.html`
+
+**Changes Made**:
+
+**1. Client Economics (Tighter Margins)**
+- Acquisition costs increased 50-75%: Residential $200→$350, Speed $350→$550, Eco $400→$650, Commercial $600→$1,000
+- Base revenue reduced 15%: Residential $300→$255, Speed $450→$380, Eco $500→$425, Commercial $800→$680
+- Satisfaction decay increased 50-60%: Residential 3→5, Speed 5→8, Eco 4→6, Commercial 6→9
+- Impact: Clients now take 4 weeks to break even vs 2 weeks
+
+**2. Employee Costs (Higher Operating Expenses)**
+- Salaries increased 25%: Trainee $400→$500, Junior $600→$750, Experienced $900→$1,125, Expert $1,200→$1,500
+- Satisfaction bonuses reduced: Trainee 10→8, Junior 15→10, Experienced 20→12, Expert 25→15
+- Impact: Without upgrades, employees barely maintain client satisfaction
+
+**3. Game State Changes**
+- Starting money reduced: $5,000→$3,000 (forces tighter early decisions)
+- Weekly overhead added: $300/week starting Week 5 (constant burn rate)
+- Victory conditions increased: $50k→$75k profit, 10→12 clients, 5→6 employees
+- Impact: 50% harder to win, takes 40-50 weeks vs 15-20
+
+**4. Equipment & Upgrade Nerfs (Still Useful, Not Game-Breaking)**
+- Equipment satisfaction bonuses reduced ~30%: Basic Sprayer 5→3, Advanced 10→7, Eco 15→10, Trap Kit 5→3, Smart Traps 12→8, Gear 8→5
+- Service Path revenue bonuses reduced: Tier 2 10%→8%, Tier 3 25%→12%
+- Service Path satisfaction bonuses reduced: Tier 2 10→5, Tier 3 20→8
+- Eco Path adjusted: Tier 3 satisfaction 10→6, revenue 15%→10%
+- Impact: Upgrades transform from "game-breaking" to "essential but balanced"
+
+**5. Event Adjustments (More Punishing)**
+- Negative events hit harder: Equipment breakdowns $200-500→$400-800, Regulation fines $300-1,000→$500-1,500, Competitor poaching -10→-20 satisfaction
+- Positive events less generous: Referral bonuses $300-800→$200-500, Equipment deals 50%→30% off
+- Impact: Events create real challenges, not just flavor
+
+**New Game Flow**:
+- **Weeks 1-5**: Survival mode - tight money, tough decisions
+- **Weeks 6-15**: Growth phase - overhead kicks in, need Tier 1 upgrades
+- **Weeks 16-30**: Scaling challenge - need Tier 2 upgrades to handle more clients
+- **Weeks 30-45**: Victory push - only with Tier 3 upgrades can you maintain 12+ clients
+
+**Success Criteria**:
+- Early game feels tight (every decision matters)
+- Upgrades are essential to reach victory (not optional)
+- Victory takes 40-50 weeks with good strategy
+- Multiple viable paths (speed/service/eco all work)
+
+---
+
 ## State Management Strategy
 
 ### Core Game State Object:

@@ -11,7 +11,7 @@ const EquipmentManager = {
             name: 'Basic Sprayer',
             description: 'Standard pest control sprayer',
             cost: 500,
-            satisfactionBonus: 5,
+            satisfactionBonus: 3,
             speedBonus: 0,
             tier: 1,
             category: 'tool'
@@ -21,7 +21,7 @@ const EquipmentManager = {
             name: 'Advanced Sprayer',
             description: 'Professional-grade sprayer with better coverage',
             cost: 1500,
-            satisfactionBonus: 10,
+            satisfactionBonus: 7,
             speedBonus: 5,
             tier: 2,
             category: 'tool',
@@ -32,7 +32,7 @@ const EquipmentManager = {
             name: 'Eco-Friendly Sprayer',
             description: 'Uses organic solutions, loved by eco-conscious clients',
             cost: 2000,
-            satisfactionBonus: 15,
+            satisfactionBonus: 10,
             speedBonus: 0,
             ecoBonus: 20,
             tier: 3,
@@ -44,7 +44,7 @@ const EquipmentManager = {
             name: 'Basic Trap Kit',
             description: 'Humane traps for rodents and pests',
             cost: 400,
-            satisfactionBonus: 5,
+            satisfactionBonus: 3,
             speedBonus: 0,
             tier: 1,
             category: 'trap'
@@ -54,7 +54,7 @@ const EquipmentManager = {
             name: 'Smart Trap System',
             description: 'IoT-enabled traps with remote monitoring',
             cost: 1800,
-            satisfactionBonus: 12,
+            satisfactionBonus: 8,
             speedBonus: 10,
             tier: 2,
             category: 'trap',
@@ -65,7 +65,7 @@ const EquipmentManager = {
             name: 'Protective Gear Set',
             description: 'Professional safety equipment',
             cost: 600,
-            satisfactionBonus: 8,
+            satisfactionBonus: 5,
             speedBonus: 0,
             tier: 1,
             category: 'safety'
@@ -121,7 +121,7 @@ const EquipmentManager = {
             description: 'Offer premium services that delight clients',
             cost: 3000,
             path: 'service',
-            effects: { satisfactionBonus: 10, revenueBonus: 0.1 },
+            effects: { satisfactionBonus: 5, revenueBonus: 0.08 },
             tier: 2,
             requires: 'SERVICE_1'
         },
@@ -131,7 +131,7 @@ const EquipmentManager = {
             description: 'Exclusive benefits for high-value clients',
             cost: 6000,
             path: 'service',
-            effects: { satisfactionBonus: 20, revenueBonus: 0.25 },
+            effects: { satisfactionBonus: 8, revenueBonus: 0.12 },
             tier: 3,
             requires: 'SERVICE_2'
         },
@@ -162,7 +162,7 @@ const EquipmentManager = {
             description: 'Revolutionary humane pest management',
             cost: 7000,
             path: 'eco',
-            effects: { ecoClientBonus: 35, satisfactionBonus: 10, revenueBonus: 0.15 },
+            effects: { ecoClientBonus: 35, satisfactionBonus: 6, revenueBonus: 0.10 },
             tier: 3,
             requires: 'ECO_2'
         }

@@ -23,36 +23,36 @@ const EmployeeManager = {
             name: 'Trainee',
             multiplier: 0.7,
             hireCost: 800,
-            weeklySalary: 400,
+            weeklySalary: 500,
             color: '#94a3b8',
-            satisfactionBonus: 10,
+            satisfactionBonus: 8,
             maxClients: 2
         },
         JUNIOR: {
             name: 'Junior',
             multiplier: 1.0,
             hireCost: 1200,
-            weeklySalary: 600,
+            weeklySalary: 750,
             color: '#60a5fa',
-            satisfactionBonus: 15,
+            satisfactionBonus: 10,
             maxClients: 3
         },
         EXPERIENCED: {
             name: 'Experienced',
             multiplier: 1.3,
             hireCost: 1800,
-            weeklySalary: 900,
+            weeklySalary: 1125,
             color: '#34d399',
-            satisfactionBonus: 20,
+            satisfactionBonus: 12,
             maxClients: 4
         },
         EXPERT: {
             name: 'Expert',
             multiplier: 1.6,
             hireCost: 2500,
-            weeklySalary: 1200,
+            weeklySalary: 1500,
             color: '#a78bfa',
-            satisfactionBonus: 25,
+            satisfactionBonus: 15,
             maxClients: 5
         }
     },

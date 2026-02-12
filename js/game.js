@@ -7,7 +7,7 @@ const Game = {
     // Game State
     state: {
         week: 1,
-        money: 5000,
+        money: 3000,
         clients: [],
         employees: [],
         trucks: [],
@@ -196,6 +196,14 @@ const Game = {
         }
 
         this.addExpense(totalSalaries);
+
+        // Business overhead (rent, insurance, utilities, licensing)
+        // Starts from Week 5 to give early game breathing room
+        if (this.state.week >= 5) {
+            const overhead = 300;
+            this.addExpense(overhead);
+            this.logAction(`Business overhead: ${this.formatMoney(overhead)} (rent, insurance, utilities)`);
+        }
     },
 
     // Process random events
@@ -341,10 +349,10 @@ const Game = {
 
     // Check for victory conditions
     checkVictoryConditions() {
-        // Victory condition: reach $50,000 profit with 10+ clients and 5+ employees
-        if (this.state.stats.totalProfit >= 50000 &&
-            this.state.clients.length >= 10 &&
-            this.state.employees.length >= 5) {
+        // Victory condition: reach $75,000 profit with 12+ clients and 6+ employees
+        if (this.state.stats.totalProfit >= 75000 &&
+            this.state.clients.length >= 12 &&
+            this.state.employees.length >= 6) {
             this.gameOver('victory');
             return true;
         }

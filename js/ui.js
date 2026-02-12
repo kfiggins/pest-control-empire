@@ -222,7 +222,7 @@ const UI = {
         const state = Game.getState();
 
         // Profit progress
-        const profitGoal = 50000;
+        const profitGoal = 75000;
         const profitProgress = Math.min(100, (state.stats.totalProfit / profitGoal) * 100);
         const profitEl = document.getElementById('victory-profit');
         const profitBarEl = document.getElementById('victory-profit-bar');
@@ -233,7 +233,7 @@ const UI = {
         }
 
         // Clients progress
-        const clientsGoal = 10;
+        const clientsGoal = 12;
         const clientsProgress = Math.min(100, (state.clients.length / clientsGoal) * 100);
         const clientsEl = document.getElementById('victory-clients');
         const clientsBarEl = document.getElementById('victory-clients-bar');
@@ -244,7 +244,7 @@ const UI = {
         }
 
         // Employees progress
-        const employeesGoal = 5;
+        const employeesGoal = 6;
         const employeesProgress = Math.min(100, (state.employees.length / employeesGoal) * 100);
         const employeesEl = document.getElementById('victory-employees');
         const employeesBarEl = document.getElementById('victory-employees-bar');
@@ -848,7 +848,7 @@ const UI = {
                 <div class="help-body">
                     <section class="help-section">
                         <h3>🎯 Goal</h3>
-                        <p>Build a successful pest control empire! Reach <strong>$50,000 profit</strong> with <strong>10+ clients</strong> and <strong>5+ employees</strong> to win.</p>
+                        <p>Build a successful pest control empire! Reach <strong>$75,000 profit</strong> with <strong>12+ clients</strong> and <strong>6+ employees</strong> to win.</p>
                     </section>
 
                     <section class="help-section">
@@ -915,7 +915,7 @@ const UI = {
                     <section class="help-section">
                         <h3>💀 Game Over</h3>
                         <p><strong>Bankruptcy:</strong> Cash drops below $0</p>
-                        <p><strong>Victory:</strong> $50,000 profit + 10 clients + 5 employees</p>
+                        <p><strong>Victory:</strong> $75,000 profit + 12 clients + 6 employees</p>
                     </section>
                 </div>
                 <div class="help-footer">

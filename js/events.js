@@ -34,15 +34,15 @@ const EventManager = {
         EQUIPMENT_DEAL: {
             id: 'equipment_deal',
             name: 'Equipment Sale',
-            description: 'A supplier is offering a 50% discount on equipment this week!',
+            description: 'A supplier is offering a 30% discount on equipment this week!',
             type: 'positive',
             baseChance: 0.10, // 10% base chance per turn
             effect: (gameState) => {
                 // Enable discount for next purchase (this will be implemented via a flag)
                 return {
                     success: true,
-                    message: '🛍️ Equipment prices reduced by 50% this week!',
-                    discount: 0.5
+                    message: '🛍️ Equipment prices reduced by 30% this week!',
+                    discount: 0.3
                 };
             }
         },
@@ -56,7 +56,7 @@ const EventManager = {
             minWeek: 5, // Only after week 5
             requiresClients: true,
             effect: (gameState) => {
-                const bonus = Math.floor(Math.random() * 500) + 300; // $300-$800
+                const bonus = Math.floor(Math.random() * 300) + 200; // $200-$500
                 gameState.money += bonus;
                 return {
                     success: true,
@@ -105,7 +105,7 @@ const EventManager = {
 
                 // Random truck breaks down
                 const truck = gameState.trucks[Math.floor(Math.random() * gameState.trucks.length)];
-                const repairCost = Math.floor(Math.random() * 300) + 200; // $200-$500
+                const repairCost = Math.floor(Math.random() * 400) + 400; // $400-$800
 
                 gameState.money -= repairCost;
                 truck.condition = Math.max(50, truck.condition - 20);
@@ -137,7 +137,7 @@ const EventManager = {
                 for (let i = 0; i < numAffected; i++) {
                     const randomClient = gameState.clients[Math.floor(Math.random() * gameState.clients.length)];
                     if (!affectedClients.includes(randomClient)) {
-                        randomClient.satisfaction -= 10;
+                        randomClient.satisfaction -= 20;
                         affectedClients.push(randomClient);
                     }
                 }
@@ -185,7 +185,7 @@ const EventManager = {
             baseChance: 0.06,
             minWeek: 10,
             effect: (gameState) => {
-                const fine = Math.floor(Math.random() * 700) + 300; // $300-$1000
+                const fine = Math.floor(Math.random() * 1000) + 500; // $500-$1500
                 gameState.money -= fine;
 
                 return {

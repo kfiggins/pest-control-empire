@@ -8,33 +8,33 @@ const ClientManager = {
     clientTypes: {
         RESIDENTIAL: {
             name: 'Residential',
-            baseRevenue: 300,
-            acquisitionCost: 200,
-            satisfactionDecay: 3,
+            baseRevenue: 255,
+            acquisitionCost: 350,
+            satisfactionDecay: 5,
             demands: ['affordable', 'reliable'],
             color: '#94a3b8'
         },
         SPEED_FOCUSED: {
             name: 'Speed Priority',
-            baseRevenue: 450,
-            acquisitionCost: 350,
-            satisfactionDecay: 5,
+            baseRevenue: 380,
+            acquisitionCost: 550,
+            satisfactionDecay: 8,
             demands: ['fast', 'responsive'],
             color: '#f59e0b'
         },
         ECO_FOCUSED: {
             name: 'Eco-Conscious',
-            baseRevenue: 500,
-            acquisitionCost: 400,
-            satisfactionDecay: 4,
+            baseRevenue: 425,
+            acquisitionCost: 650,
+            satisfactionDecay: 6,
             demands: ['eco-friendly', 'humane'],
             color: '#10b981'
         },
         COMMERCIAL: {
             name: 'Commercial',
-            baseRevenue: 800,
-            acquisitionCost: 600,
-            satisfactionDecay: 6,
+            baseRevenue: 680,
+            acquisitionCost: 1000,
+            satisfactionDecay: 9,
             demands: ['professional', 'discreet'],
             color: '#8b5cf6'
         }
