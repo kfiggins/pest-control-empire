@@ -179,6 +179,9 @@ const UI = {
         this.elements.totalExpenses.textContent = Game.formatMoney(state.stats.totalExpenses);
         this.elements.totalProfit.textContent = Game.formatMoney(state.stats.totalProfit);
 
+        // Check for active events and display notification
+        this.displayEventNotification();
+
         // Render client list
         this.renderClientList();
 
@@ -213,6 +216,54 @@ const UI = {
     // Clear action log
     clearLog() {
         this.elements.actionLog.innerHTML = '';
+    },
+
+    // Display event notification if there's an active event
+    displayEventNotification() {
+        if (!window.EventManager) return;
+
+        const event = EventManager.getActiveEvent();
+
+        // Find or create event notification area
+        let eventNotification = document.getElementById('event-notification');
+        if (!eventNotification) {
+            eventNotification = document.createElement('div');
+            eventNotification.id = 'event-notification';
+            eventNotification.className = 'event-notification';
+            document.body.appendChild(eventNotification);
+        }
+
+        if (event) {
+            // Determine event class based on type
+            let eventClass = 'event-neutral';
+            if (event.type === 'positive') eventClass = 'event-positive';
+            if (event.type === 'negative') eventClass = 'event-negative';
+
+            eventNotification.innerHTML = `
+                <div class="event-content ${eventClass}">
+                    <div class="event-header">
+                        <span class="event-icon">${event.type === 'positive' ? '✨' : event.type === 'negative' ? '⚠️' : 'ℹ️'}</span>
+                        <span class="event-name">${event.name}</span>
+                    </div>
+                    <div class="event-message">${event.message}</div>
+                    <button class="btn btn-primary event-dismiss" onclick="UI.dismissEvent()">OK</button>
+                </div>
+            `;
+            eventNotification.style.display = 'flex';
+        } else {
+            eventNotification.style.display = 'none';
+        }
+    },
+
+    // Dismiss the active event notification
+    dismissEvent() {
+        if (window.EventManager) {
+            EventManager.clearActiveEvent();
+        }
+        const eventNotification = document.getElementById('event-notification');
+        if (eventNotification) {
+            eventNotification.style.display = 'none';
+        }
     },
 
     // Render client list

@@ -174,8 +174,18 @@ const Game = {
 
     // Process random events
     processEvents() {
-        // Placeholder for Phase 5 - Events & Challenges
-        // Random events will be processed here
+        // Clean up any effects from previous turn (e.g., restore sick employees)
+        if (window.EventManager) {
+            EventManager.processTurnCleanup(this.state);
+        }
+
+        // Check for new events
+        if (window.EventManager) {
+            const event = EventManager.checkForEvent(this.state);
+            if (event) {
+                EventManager.triggerEvent(this.state, event);
+            }
+        }
     },
 
     // Update overall game state after turn

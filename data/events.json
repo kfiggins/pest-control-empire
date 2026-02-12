@@ -1,0 +1,47 @@
+{
+  "events": {
+    "positive": [
+      "new_client_opportunity",
+      "equipment_deal",
+      "referral_bonus"
+    ],
+    "negative": [
+      "pest_surge",
+      "equipment_breakdown",
+      "competitor_poaching",
+      "employee_sick",
+      "regulation_fine"
+    ],
+    "neutral": [
+      "business_loan_offer"
+    ]
+  },
+  "seasonalModifiers": {
+    "spring": {
+      "pest_surge": 1.0
+    },
+    "summer": {
+      "pest_surge": 1.5
+    },
+    "fall": {
+      "pest_surge": 1.5
+    },
+    "winter": {
+      "pest_surge": 0.7
+    }
+  },
+  "difficultyModifiers": {
+    "easy": {
+      "positiveEventChance": 1.3,
+      "negativeEventChance": 0.7
+    },
+    "normal": {
+      "positiveEventChance": 1.0,
+      "negativeEventChance": 1.0
+    },
+    "hard": {
+      "positiveEventChance": 0.7,
+      "negativeEventChance": 1.3
+    }
+  }
+}

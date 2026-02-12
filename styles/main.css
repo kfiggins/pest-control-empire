@@ -945,3 +945,110 @@ body {
 .neutral {
     color: var(--color-neutral);
 }
+
+/* Event Notifications */
+.event-notification {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.event-content {
+    background: linear-gradient(135deg, var(--color-bg-dark) 0%, rgba(20, 30, 20, 1) 100%);
+    border: 2px solid var(--color-border);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-xl);
+    max-width: 500px;
+    min-width: 400px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.event-positive {
+    border-color: var(--color-primary);
+    box-shadow: 0 10px 40px rgba(44, 95, 45, 0.3);
+}
+
+.event-negative {
+    border-color: var(--color-negative);
+    box-shadow: 0 10px 40px rgba(204, 50, 50, 0.3);
+}
+
+.event-neutral {
+    border-color: var(--color-neutral);
+    box-shadow: 0 10px 40px rgba(200, 200, 200, 0.2);
+}
+
+.event-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+}
+
+.event-icon {
+    font-size: 2rem;
+}
+
+.event-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+}
+
+.event-message {
+    font-size: 1rem;
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+    margin-bottom: var(--spacing-lg);
+    padding: var(--spacing-md);
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: var(--border-radius);
+    border-left: 3px solid var(--color-primary);
+}
+
+.event-positive .event-message {
+    border-left-color: var(--color-primary);
+}
+
+.event-negative .event-message {
+    border-left-color: var(--color-negative);
+}
+
+.event-neutral .event-message {
+    border-left-color: var(--color-neutral);
+}
+
+.event-dismiss {
+    width: 100%;
+    padding: var(--spacing-md);
+    font-size: 1rem;
+}
