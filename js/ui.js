@@ -112,14 +112,14 @@ const UI = {
 
         tabButtons.forEach(button => {
             button.addEventListener('click', (e) => {
-                const targetTab = e.target.dataset.tab;
+                const targetTab = e.currentTarget.dataset.tab;
 
                 // Remove active from all tabs
                 tabButtons.forEach(btn => btn.classList.remove('active'));
                 tabContents.forEach(content => content.classList.remove('active'));
 
                 // Add active to clicked tab
-                e.target.classList.add('active');
+                e.currentTarget.classList.add('active');
                 const targetContent = document.getElementById(`tab-${targetTab}`);
                 if (targetContent) {
                     targetContent.classList.add('active');
@@ -353,10 +353,13 @@ const UI = {
             }).length;
 
             const totalCount = state.clients.length;
-            const clientBadge = totalCount > 0 ? ` <span class="tab-badge">${assignedCount}/${totalCount}</span>` : '';
+            const clientBadge = totalCount > 0 ? `<div><span class="tab-badge">${assignedCount}/${totalCount}</span></div>` : '';
 
             if (clientsTabBtn) {
-                clientsTabBtn.innerHTML = `👥 Clients${clientBadge}`;
+                clientsTabBtn.innerHTML = `
+                    <div>👥 Clients</div>
+                    ${clientBadge}
+                `;
             }
             if (clientsBottomNav) {
                 const label = clientsBottomNav.querySelector('.label');
@@ -379,11 +382,18 @@ const UI = {
                 return promotionInfo && promotionInfo.canPromote;
             }).length;
 
-            const empBadge = employeeCount > 0 ? ` <span class="tab-badge">${employeeCount}</span>` : '';
-            const promotionIndicator = promotableCount > 0 ? ` <span class="tab-notification">${promotableCount}</span>` : '';
+            const empBadgeHTML = employeeCount > 0 || promotableCount > 0 ? `
+                <div>
+                    ${employeeCount > 0 ? `<span class="tab-badge">${employeeCount}</span>` : ''}
+                    ${promotableCount > 0 ? `<span class="tab-notification">${promotableCount}</span>` : ''}
+                </div>
+            ` : '';
 
             if (employeesTabBtn) {
-                employeesTabBtn.innerHTML = `👷 Employees${empBadge}${promotionIndicator}`;
+                employeesTabBtn.innerHTML = `
+                    <div>👷 Employees</div>
+                    ${empBadgeHTML}
+                `;
             }
             if (employeesBottomNav) {
                 const label = employeesBottomNav.querySelector('.label');
