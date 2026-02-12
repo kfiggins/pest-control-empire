@@ -256,6 +256,68 @@
 
 ---
 
+### **Phase 10: Radical Difficulty Overhaul** ⏱️ ~1 session
+**Goal**: Make game extremely challenging by forcing reliance on referrals and weekly profit targets
+
+**Why This Feature?**
+- User feedback: "It's still too easy. I didn't have to buy any upgrades again"
+- Problem: Even after Phase 9 balance, game was still too easy to beat
+- Solution: Exponential client costs, referral-based growth, weekly profit win condition, massive satisfaction nerf
+
+**Files**: Update `js/employee.js`, `js/game.js`, `js/ui.js`, `index.html`
+
+**Changes Made**:
+
+**1. Satisfaction Restoration Massive Nerf (60% reduction)**
+- Only Expert employees can maintain Commercial clients without upgrades
+- Trainee: 8→3, Junior: 10→5, Experienced: 12→7, Expert: 15→9
+- Forces players to match employee skill to client difficulty
+- Makes equipment/upgrades absolutely essential for lower-tier employees
+
+**2. Exponential Client Acquisition Costs**
+- Cost multiplier: 1.3 ^ clientsAcquired
+- First few clients affordable ($350-$1,000)
+- By 10th client: Costs increase 13.8x (~$4,800-$13,800)
+- Forces reliance on referrals for growth instead of buying all clients
+
+**3. Referral System**
+- Happy clients (satisfaction ≥ 80) have 15% chance to refer new client each week
+- Referrals are FREE (no acquisition cost)
+- Rewards maintaining high satisfaction
+- Becomes primary growth mechanism in mid/late game
+
+**4. Victory Condition: Weekly Profit**
+- Changed from $75k total profit to $25k weekly profit
+- Requires ~50+ clients with full upgrade paths
+- Victory only achievable in very late game (40-60+ weeks)
+- Tests sustained profitability, not just accumulation
+
+**5. UI Updates**
+- Victory progress shows "Weekly Profit" instead of "Total Profit"
+- Client acquisition button shows dynamic cost with % increase indicator
+- Victory goals: $25k/week, 12 clients, 6 employees
+
+**New Game Balance**:
+- Commercial client + Trainee: -6 net satisfaction/week (will lose client)
+- Commercial client + Junior: -4 net satisfaction/week
+- Commercial client + Experienced: -2 net satisfaction/week
+- Commercial client + Expert: 0 net (perfect balance!)
+- With upgrades/equipment: Lower tiers can maintain harder clients
+
+**Expected Progression**:
+- Weeks 1-10: Survive with starter clients, hire employees carefully
+- Weeks 11-25: Scale via referrals, invest in Tier 1-2 upgrades
+- Weeks 26-40: Build referral engine with high satisfaction
+- Weeks 41-60+: Reach $25k/week with 50+ clients and full upgrades
+
+**Success Criteria**:
+- Early game requires careful resource management
+- Mid game growth depends on referrals (buying clients becomes prohibitively expensive)
+- Late game requires full upgrade investment to maintain large client base
+- Victory feels truly earned
+
+---
+
 ## State Management Strategy
 
 ### Core Game State Object:

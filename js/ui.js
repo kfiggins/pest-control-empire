@@ -177,6 +177,19 @@ const UI = {
         this.elements.employeeCount.textContent = state.employees.length;
         this.elements.truckCount.textContent = state.trucks.length;
 
+        // Update client acquisition cost display (dynamic based on clients acquired)
+        const costMultiplier = Game.getClientAcquisitionMultiplier();
+        const minCost = Math.floor(350 * costMultiplier); // Residential base
+        const maxCost = Math.floor(1000 * costMultiplier); // Commercial base
+        const clientCostInfo = document.querySelector('#acquire-client-btn + .action-info p:first-child');
+        if (clientCostInfo) {
+            if (costMultiplier > 1.2) {
+                clientCostInfo.innerHTML = `Cost: ${Game.formatMoney(minCost)} - ${Game.formatMoney(maxCost)} <span style="color: var(--color-accent);">(+${Math.round((costMultiplier - 1) * 100)}%)</span>`;
+            } else {
+                clientCostInfo.textContent = `Cost: ${Game.formatMoney(minCost)} - ${Game.formatMoney(maxCost)}`;
+            }
+        }
+
         // Update weekly summary
         this.elements.weeklyRevenue.textContent = Game.formatMoney(state.weeklyRevenue);
         this.elements.weeklyExpenses.textContent = Game.formatMoney(state.weeklyExpenses);
@@ -221,12 +234,13 @@ const UI = {
     updateVictoryProgress() {
         const state = Game.getState();
 
-        // Profit progress
-        const profitGoal = 75000;
-        const profitProgress = Math.min(100, (state.stats.totalProfit / profitGoal) * 100);
+        // Weekly profit progress (revenue - expenses for current week)
+        const weeklyProfit = state.weeklyRevenue - state.weeklyExpenses;
+        const profitGoal = 25000;
+        const profitProgress = Math.min(100, (weeklyProfit / profitGoal) * 100);
         const profitEl = document.getElementById('victory-profit');
         const profitBarEl = document.getElementById('victory-profit-bar');
-        if (profitEl) profitEl.textContent = `${Game.formatMoney(state.stats.totalProfit)} / ${Game.formatMoney(profitGoal)}`;
+        if (profitEl) profitEl.textContent = `${Game.formatMoney(weeklyProfit)} / ${Game.formatMoney(profitGoal)}`;
         if (profitBarEl) {
             profitBarEl.style.width = `${profitProgress}%`;
             profitBarEl.style.backgroundColor = profitProgress >= 100 ? 'var(--color-primary)' : 'var(--color-secondary)';

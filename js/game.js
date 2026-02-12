@@ -77,6 +77,9 @@ const Game = {
         // Phase 0: Process jobs (employees service clients)
         this.processJobs();
 
+        // Phase 0.5: Process referrals (happy clients refer new clients)
+        this.processReferrals();
+
         // Phase 1: Process revenue (jobs, clients)
         this.processRevenue();
 
@@ -135,6 +138,35 @@ const Game = {
 
         if (jobsCompleted > 0) {
             this.logAction(`✅ Completed ${jobsCompleted} service jobs`);
+        }
+    },
+
+    // Process client referrals (happy clients refer new clients)
+    processReferrals() {
+        const REFERRAL_SATISFACTION_THRESHOLD = 80;
+        const REFERRAL_CHANCE = 0.15; // 15% chance per week if satisfied
+
+        let referralsThisWeek = 0;
+
+        this.state.clients.forEach(client => {
+            // Only satisfied clients can refer (>= 80 satisfaction)
+            if (client.satisfaction >= REFERRAL_SATISFACTION_THRESHOLD) {
+                // Random chance to refer
+                if (Math.random() < REFERRAL_CHANCE) {
+                    // Generate a new random client for free
+                    const newClient = ClientManager.generateClient();
+                    this.state.clients.push(newClient);
+                    this.state.stats.clientsAcquired++;
+                    referralsThisWeek++;
+
+                    this.logAction(`🎉 ${client.name} referred a new client: ${newClient.name}!`);
+                    console.log(`👥 Referral from ${client.name} → ${newClient.name}`);
+                }
+            }
+        });
+
+        if (referralsThisWeek > 0) {
+            console.log(`📞 ${referralsThisWeek} referral(s) this week`);
         }
     },
 
@@ -349,8 +381,11 @@ const Game = {
 
     // Check for victory conditions
     checkVictoryConditions() {
-        // Victory condition: reach $75,000 profit with 12+ clients and 6+ employees
-        if (this.state.stats.totalProfit >= 75000 &&
+        // Calculate weekly profit
+        const weeklyProfit = this.state.weeklyRevenue - this.state.weeklyExpenses;
+
+        // Victory condition: reach $25,000 WEEKLY profit with 12+ clients and 6+ employees
+        if (weeklyProfit >= 25000 &&
             this.state.clients.length >= 12 &&
             this.state.employees.length >= 6) {
             this.gameOver('victory');
@@ -460,10 +495,21 @@ const Game = {
         return false;
     },
 
-    // Acquire a new client
+    // Calculate exponential cost multiplier for client acquisition
+    // Cost increases with each client acquired to encourage referrals
+    getClientAcquisitionMultiplier() {
+        const clientsAcquired = this.state.stats.clientsAcquired || 0;
+        // Exponential formula: 1.3 ^ clientsAcquired
+        // First few clients affordable, but gets expensive fast
+        return Math.pow(1.3, clientsAcquired);
+    },
+
+    // Acquire a new client (cost increases exponentially)
     acquireClient(typeKey = null) {
         const client = ClientManager.generateClient(typeKey);
-        const cost = client.typeData.acquisitionCost;
+        const baseCost = client.typeData.acquisitionCost;
+        const multiplier = this.getClientAcquisitionMultiplier();
+        const cost = Math.floor(baseCost * multiplier);
 
         // Check if we can afford it
         if (this.state.money < cost) {
