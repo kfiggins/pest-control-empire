@@ -28,6 +28,10 @@ const Game = {
             totalJobs: 0
         },
 
+        // Game state
+        gameOver: false,
+        gameOverReason: null,
+
         // Settings
         settings: {
             difficulty: 'normal'
@@ -37,6 +41,17 @@ const Game = {
     // Initialize game
     init() {
         console.log('🎮 Game initialized');
+
+        // Try to load saved game
+        if (window.StorageManager && StorageManager.hasSavedGame()) {
+            const savedState = StorageManager.loadGame();
+            if (savedState) {
+                this.state = savedState;
+                this.logAction(`Game loaded from ${StorageManager.getFormattedSaveTime()}`);
+                console.log('📂 Loaded saved game');
+            }
+        }
+
         this.resetWeeklyStats();
     },
 
@@ -48,6 +63,12 @@ const Game = {
 
     // Main turn execution - this is where the magic happens each week
     executeTurn() {
+        // Don't allow turns if game is over
+        if (this.state.gameOver) {
+            console.log('⚠️ Cannot execute turn - game is over');
+            return;
+        }
+
         console.log(`📅 Executing Week ${this.state.week}`);
 
         // Reset weekly tracking
@@ -76,6 +97,11 @@ const Game = {
         this.logAction(`Week ${this.state.week - 1} complete. Net: ${this.formatMoney(netProfit)}`);
 
         console.log(`✅ Week ${this.state.week - 1} complete. Cash: ${this.formatMoney(this.state.money)}`);
+
+        // Auto-save after each turn
+        if (window.StorageManager) {
+            StorageManager.autoSave(this.state);
+        }
     },
 
     // Process jobs (employees service clients)
@@ -228,7 +254,11 @@ const Game = {
         // Check for game over conditions
         if (this.state.money < 0) {
             this.gameOver('bankruptcy');
+            return;
         }
+
+        // Check for victory conditions
+        this.checkVictoryConditions();
     },
 
     // Add revenue to weekly total
@@ -260,7 +290,46 @@ const Game = {
     // Game over handling
     gameOver(reason) {
         console.log(`💀 Game Over: ${reason}`);
-        this.logAction(`GAME OVER: ${reason === 'bankruptcy' ? 'Your business went bankrupt!' : 'Unknown reason'}`);
+
+        // Mark game as over in state
+        this.state.gameOver = true;
+        this.state.gameOverReason = reason;
+
+        // Build game over message
+        let message = '';
+        let title = '';
+
+        if (reason === 'bankruptcy') {
+            title = '💀 GAME OVER - Bankruptcy';
+            message = `Your business went bankrupt in week ${this.state.week}!\n\n`;
+            message += `Final Statistics:\n`;
+            message += `• Total Revenue: ${this.formatMoney(this.state.stats.totalRevenue)}\n`;
+            message += `• Total Expenses: ${this.formatMoney(this.state.stats.totalExpenses)}\n`;
+            message += `• Clients Acquired: ${this.state.stats.clientsAcquired}\n`;
+            message += `• Jobs Completed: ${this.state.stats.totalJobs}\n\n`;
+            message += `Better luck next time!`;
+        } else if (reason === 'victory') {
+            title = '🎉 VICTORY!';
+            message = `Congratulations! You've built a successful pest control empire!\n\n`;
+            message += `Final Statistics:\n`;
+            message += `• Weeks Survived: ${this.state.week}\n`;
+            message += `• Total Profit: ${this.formatMoney(this.state.stats.totalProfit)}\n`;
+            message += `• Clients: ${this.state.clients.length}\n`;
+            message += `• Employees: ${this.state.employees.length}\n`;
+            message += `• Jobs Completed: ${this.state.stats.totalJobs}`;
+        }
+
+        this.logAction(`${title}: ${reason}`);
+
+        // Show game over modal via UI
+        if (window.UI && UI.showGameOverModal) {
+            setTimeout(() => {
+                UI.showGameOverModal(title, message, reason);
+            }, 500);
+        } else {
+            // Fallback to alert if UI not available
+            alert(`${title}\n\n${message}`);
+        }
 
         // Disable further turns
         const nextWeekBtn = document.getElementById('next-week-btn');
@@ -270,9 +339,26 @@ const Game = {
         }
     },
 
+    // Check for victory conditions
+    checkVictoryConditions() {
+        // Victory condition: reach $50,000 profit with 10+ clients and 5+ employees
+        if (this.state.stats.totalProfit >= 50000 &&
+            this.state.clients.length >= 10 &&
+            this.state.employees.length >= 5) {
+            this.gameOver('victory');
+            return true;
+        }
+        return false;
+    },
+
     // Start new game
     newGame() {
         console.log('🔄 Starting new game');
+
+        // Delete any existing save
+        if (window.StorageManager) {
+            StorageManager.deleteSave();
+        }
 
         // Reset state
         this.state = {
@@ -293,6 +379,8 @@ const Game = {
                 clientsLost: 0,
                 totalJobs: 0
             },
+            gameOver: false,
+            gameOverReason: null,
             settings: {
                 difficulty: 'normal'
             }
@@ -315,11 +403,53 @@ const Game = {
         if (window.UI && UI.update) {
             UI.update();
         }
+
+        // Save initial state
+        if (window.StorageManager) {
+            StorageManager.saveGame(this.state);
+        }
     },
 
     // Get current game state (for debugging and save/load)
     getState() {
         return this.state;
+    },
+
+    // Manual save game
+    saveGame() {
+        if (window.StorageManager) {
+            const success = StorageManager.saveGame(this.state);
+            if (success) {
+                this.logAction('💾 Game saved successfully!');
+                return true;
+            } else {
+                this.logAction('❌ Failed to save game');
+                return false;
+            }
+        }
+        return false;
+    },
+
+    // Manual load game
+    loadGame() {
+        if (window.StorageManager) {
+            const savedState = StorageManager.loadGame();
+            if (savedState) {
+                this.state = savedState;
+                this.logAction(`📂 Game loaded from ${StorageManager.getFormattedSaveTime()}`);
+
+                // Refresh UI
+                if (window.UI && UI.update) {
+                    UI.update();
+                }
+
+                return true;
+            } else {
+                this.logAction('❌ No saved game found');
+                return false;
+            }
+        }
+        return false;
     },
 
     // Acquire a new client

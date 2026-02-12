@@ -84,13 +84,13 @@ const UI = {
             this.onNewGame();
         });
 
-        // Save/Load buttons (disabled for now, will be implemented in Phase 6)
+        // Save/Load buttons
         this.elements.saveGameBtn.addEventListener('click', () => {
-            this.addLogEntry('Save feature coming in Phase 6!');
+            this.onSaveGame();
         });
 
         this.elements.loadGameBtn.addEventListener('click', () => {
-            this.addLogEntry('Load feature coming in Phase 6!');
+            this.onLoadGame();
         });
     },
 
@@ -133,6 +133,19 @@ const UI = {
         if (confirmed) {
             Game.newGame();
             this.update();
+        }
+    },
+
+    // Handle Save Game button click
+    onSaveGame() {
+        Game.saveGame();
+    },
+
+    // Handle Load Game button click
+    onLoadGame() {
+        const confirmed = confirm('Load saved game? Current unsaved progress will be lost.');
+        if (confirmed) {
+            Game.loadGame();
         }
     },
 
@@ -662,6 +675,46 @@ const UI = {
                 }
             });
         });
+    },
+
+    // Show game over modal
+    showGameOverModal(title, message, reason) {
+        // Create or get game over modal
+        let modal = document.getElementById('game-over-modal');
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.id = 'game-over-modal';
+            modal.className = 'game-over-modal';
+            document.body.appendChild(modal);
+        }
+
+        const isVictory = reason === 'victory';
+        const modalClass = isVictory ? 'modal-victory' : 'modal-defeat';
+
+        modal.innerHTML = `
+            <div class="game-over-content ${modalClass}">
+                <div class="game-over-header">
+                    <span class="game-over-icon">${isVictory ? '🎉' : '💀'}</span>
+                    <h2 class="game-over-title">${title}</h2>
+                </div>
+                <div class="game-over-message">${message.replace(/\n/g, '<br>')}</div>
+                <div class="game-over-actions">
+                    <button class="btn btn-primary btn-large" onclick="UI.closeGameOverModal(); Game.newGame();">
+                        New Game
+                    </button>
+                </div>
+            </div>
+        `;
+
+        modal.style.display = 'flex';
+    },
+
+    // Close game over modal
+    closeGameOverModal() {
+        const modal = document.getElementById('game-over-modal');
+        if (modal) {
+            modal.style.display = 'none';
+        }
     }
 };
 
