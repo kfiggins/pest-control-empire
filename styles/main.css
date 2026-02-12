@@ -594,6 +594,55 @@ body {
     color: var(--color-text-primary);
 }
 
+/* Assigned Clients Section */
+.assigned-clients-section {
+    margin-top: var(--spacing-sm);
+    padding-top: var(--spacing-sm);
+    border-top: 1px solid var(--color-border);
+}
+
+.assigned-clients {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-xs);
+    margin-top: var(--spacing-xs);
+}
+
+.assigned-client-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    background-color: var(--color-primary-dark);
+    color: var(--color-secondary);
+    border-radius: var(--border-radius);
+    font-size: 0.85rem;
+}
+
+.unassign-client-btn {
+    background: none;
+    border: none;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    padding: 0;
+    margin-left: 4px;
+    font-size: 1.2rem;
+    line-height: 1;
+    transition: color var(--transition-speed);
+}
+
+.unassign-client-btn:hover {
+    color: var(--color-negative);
+}
+
+.no-assignments {
+    color: var(--color-text-muted);
+    font-style: italic;
+    font-size: 0.85rem;
+    margin-top: var(--spacing-xs);
+    display: inline-block;
+}
+
 /* Employee Actions */
 .employee-actions {
     display: flex;

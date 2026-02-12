@@ -25,7 +25,8 @@ const EmployeeManager = {
             hireCost: 800,
             weeklySalary: 400,
             color: '#94a3b8',
-            satisfactionBonus: 10
+            satisfactionBonus: 10,
+            maxClients: 2
         },
         JUNIOR: {
             name: 'Junior',
@@ -33,7 +34,8 @@ const EmployeeManager = {
             hireCost: 1200,
             weeklySalary: 600,
             color: '#60a5fa',
-            satisfactionBonus: 15
+            satisfactionBonus: 15,
+            maxClients: 3
         },
         EXPERIENCED: {
             name: 'Experienced',
@@ -41,7 +43,8 @@ const EmployeeManager = {
             hireCost: 1800,
             weeklySalary: 900,
             color: '#34d399',
-            satisfactionBonus: 20
+            satisfactionBonus: 20,
+            maxClients: 4
         },
         EXPERT: {
             name: 'Expert',
@@ -49,7 +52,8 @@ const EmployeeManager = {
             hireCost: 2500,
             weeklySalary: 1200,
             color: '#a78bfa',
-            satisfactionBonus: 25
+            satisfactionBonus: 25,
+            maxClients: 5
         }
     },
 
@@ -74,7 +78,8 @@ const EmployeeManager = {
             skillLevel: skillKey,
             skillData: skill,
             salary: skill.weeklySalary,
-            assignedClient: null, // Client ID they're assigned to
+            assignedClients: [], // Array of client IDs they're assigned to
+            maxClients: skill.maxClients,
             weeksEmployed: 0,
             totalJobsCompleted: 0,
             truckId: null // Will be assigned when hired
@@ -160,7 +165,17 @@ const EmployeeManager = {
 
     // Check if employee can be assigned to more clients
     canAssign(employee) {
-        return employee.assignedClient === null;
+        return employee.assignedClients.length < employee.maxClients;
+    },
+
+    // Get number of available client slots
+    getAvailableSlots(employee) {
+        return employee.maxClients - employee.assignedClients.length;
+    },
+
+    // Check if employee is assigned to a specific client
+    isAssignedToClient(employee, clientId) {
+        return employee.assignedClients.includes(clientId);
     },
 
     // Assign employee to client
@@ -168,13 +183,26 @@ const EmployeeManager = {
         if (!this.canAssign(employee)) {
             return false;
         }
-        employee.assignedClient = clientId;
+        if (this.isAssignedToClient(employee, clientId)) {
+            return false; // Already assigned to this client
+        }
+        employee.assignedClients.push(clientId);
         return true;
     },
 
-    // Unassign employee from client
-    unassign(employee) {
-        employee.assignedClient = null;
+    // Unassign employee from specific client
+    unassignFromClient(employee, clientId) {
+        const index = employee.assignedClients.indexOf(clientId);
+        if (index > -1) {
+            employee.assignedClients.splice(index, 1);
+            return true;
+        }
+        return false;
+    },
+
+    // Unassign employee from all clients
+    unassignAll(employee) {
+        employee.assignedClients = [];
     }
 };
 

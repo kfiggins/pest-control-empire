@@ -304,14 +304,27 @@ const UI = {
             const employeeCard = document.createElement('div');
             employeeCard.className = 'employee-card';
 
-            // Find assigned client if any
-            let assignedClientName = 'None';
-            if (employee.assignedClient) {
-                const client = state.clients.find(c => c.id === employee.assignedClient);
-                if (client) {
-                    assignedClientName = client.name;
-                }
+            // Build assigned clients list
+            let assignedClientsHTML = '';
+            if (employee.assignedClients.length === 0) {
+                assignedClientsHTML = '<span class="no-assignments">No clients assigned</span>';
+            } else {
+                assignedClientsHTML = '<div class="assigned-clients">';
+                employee.assignedClients.forEach(clientId => {
+                    const client = state.clients.find(c => c.id === clientId);
+                    if (client) {
+                        assignedClientsHTML += `
+                            <div class="assigned-client-tag">
+                                ${client.name}
+                                <button class="unassign-client-btn" data-employee-id="${employee.id}" data-client-id="${clientId}">×</button>
+                            </div>
+                        `;
+                    }
+                });
+                assignedClientsHTML += '</div>';
             }
+
+            const availableSlots = employee.maxClients - employee.assignedClients.length;
 
             employeeCard.innerHTML = `
                 <div class="employee-header">
@@ -328,6 +341,12 @@ const UI = {
                         </span>
                     </div>
                     <div class="employee-stat">
+                        <span class="employee-stat-label">Capacity:</span>
+                        <span class="employee-stat-value ${availableSlots === 0 ? 'negative' : 'positive'}">
+                            ${employee.assignedClients.length}/${employee.maxClients} clients
+                        </span>
+                    </div>
+                    <div class="employee-stat">
                         <span class="employee-stat-label">Jobs Done:</span>
                         <span class="employee-stat-value">
                             ${employee.totalJobsCompleted}
@@ -339,12 +358,10 @@ const UI = {
                             ${employee.weeksEmployed}
                         </span>
                     </div>
-                    <div class="employee-stat">
-                        <span class="employee-stat-label">Assigned To:</span>
-                        <span class="employee-stat-value">
-                            ${assignedClientName}
-                        </span>
-                    </div>
+                </div>
+                <div class="assigned-clients-section">
+                    <span class="employee-stat-label">Assigned Clients:</span>
+                    ${assignedClientsHTML}
                 </div>
                 <div class="employee-actions">
                     ${this.renderEmployeeAssignmentControls(employee, state.clients)}
@@ -364,15 +381,23 @@ const UI = {
             return '<p class="assignment-hint">No clients to assign</p>';
         }
 
-        if (employee.assignedClient) {
-            return `<button class="btn btn-small btn-secondary unassign-btn" data-employee-id="${employee.id}">Unassign</button>`;
+        // Check if employee is at capacity
+        if (!EmployeeManager.canAssign(employee)) {
+            return '<p class="assignment-hint">At full capacity</p>';
+        }
+
+        // Filter out already assigned clients
+        const availableClients = clients.filter(c => !employee.assignedClients.includes(c.id));
+
+        if (availableClients.length === 0) {
+            return '<p class="assignment-hint">All clients already assigned</p>';
         }
 
         // Create dropdown of available clients
         let html = `<select class="client-select" data-employee-id="${employee.id}">`;
         html += '<option value="">Select Client...</option>';
 
-        clients.forEach(client => {
+        availableClients.forEach(client => {
             html += `<option value="${client.id}">${client.name}</option>`;
         });
 
@@ -399,12 +424,13 @@ const UI = {
             });
         });
 
-        // Unassign buttons
-        const unassignBtns = document.querySelectorAll('.unassign-btn');
-        unassignBtns.forEach(btn => {
+        // Unassign client buttons (the × buttons on assigned client tags)
+        const unassignClientBtns = document.querySelectorAll('.unassign-client-btn');
+        unassignClientBtns.forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const employeeId = e.target.dataset.employeeId;
-                Game.unassignEmployee(employeeId);
+                const clientId = e.target.dataset.clientId;
+                Game.unassignEmployee(employeeId, clientId);
                 this.update();
             });
         });

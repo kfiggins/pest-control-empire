@@ -82,11 +82,11 @@ const Game = {
     processJobs() {
         let jobsCompleted = 0;
 
-        // Process each employee's assignment
+        // Process each employee's assignments
         this.state.employees.forEach(employee => {
-            if (employee.assignedClient) {
-                // Find the client
-                const client = this.state.clients.find(c => c.id === employee.assignedClient);
+            // Service all assigned clients
+            employee.assignedClients.forEach(clientId => {
+                const client = this.state.clients.find(c => c.id === clientId);
 
                 if (client) {
                     // Service the client
@@ -97,7 +97,7 @@ const Game = {
                         this.state.stats.totalJobs++;
                     }
                 }
-            }
+            });
 
             // Increment weeks employed
             employee.weeksEmployed++;
@@ -347,33 +347,41 @@ const Game = {
 
         // Check if employee can be assigned
         if (!EmployeeManager.canAssign(employee)) {
-            this.logAction(`❌ ${employee.name} is already assigned`);
+            this.logAction(`❌ ${employee.name} is at full capacity (${employee.maxClients} clients)`);
+            return false;
+        }
+
+        // Check if already assigned to this client
+        if (EmployeeManager.isAssignedToClient(employee, clientId)) {
+            this.logAction(`❌ ${employee.name} is already assigned to ${client.name}`);
             return false;
         }
 
         // Assign employee to client
-        EmployeeManager.assignToClient(employee, clientId);
-        this.logAction(`📋 Assigned ${employee.name} to ${client.name}`);
+        const success = EmployeeManager.assignToClient(employee, clientId);
+        if (success) {
+            this.logAction(`📋 Assigned ${employee.name} to ${client.name} (${employee.assignedClients.length}/${employee.maxClients})`);
+        }
 
-        return true;
+        return success;
     },
 
-    // Unassign employee from client
-    unassignEmployee(employeeId) {
+    // Unassign employee from specific client
+    unassignEmployee(employeeId, clientId) {
         const employee = this.state.employees.find(e => e.id === employeeId);
 
         if (!employee) {
             return false;
         }
 
-        const client = this.state.clients.find(c => c.id === employee.assignedClient);
-        EmployeeManager.unassign(employee);
+        const client = this.state.clients.find(c => c.id === clientId);
+        const success = EmployeeManager.unassignFromClient(employee, clientId);
 
-        if (client) {
-            this.logAction(`📋 Unassigned ${employee.name} from ${client.name}`);
+        if (success && client) {
+            this.logAction(`📋 Unassigned ${employee.name} from ${client.name} (${employee.assignedClients.length}/${employee.maxClients})`);
         }
 
-        return true;
+        return success;
     }
 };
 
