@@ -58,7 +58,8 @@ const UI = {
             nextWeekBtn: document.getElementById('next-week-btn'),
             newGameBtn: document.getElementById('new-game-btn'),
             saveGameBtn: document.getElementById('save-game-btn'),
-            loadGameBtn: document.getElementById('load-game-btn')
+            loadGameBtn: document.getElementById('load-game-btn'),
+            helpBtn: document.getElementById('help-btn')
         };
     },
 
@@ -91,6 +92,11 @@ const UI = {
 
         this.elements.loadGameBtn.addEventListener('click', () => {
             this.onLoadGame();
+        });
+
+        // Help button
+        this.elements.helpBtn.addEventListener('click', () => {
+            this.showHelpModal();
         });
     },
 
@@ -192,6 +198,9 @@ const UI = {
         this.elements.totalExpenses.textContent = Game.formatMoney(state.stats.totalExpenses);
         this.elements.totalProfit.textContent = Game.formatMoney(state.stats.totalProfit);
 
+        // Update victory progress
+        this.updateVictoryProgress();
+
         // Check for active events and display notification
         this.displayEventNotification();
 
@@ -206,6 +215,44 @@ const UI = {
 
         // Render upgrade tree
         this.renderUpgradeTree();
+    },
+
+    // Update victory progress bars
+    updateVictoryProgress() {
+        const state = Game.getState();
+
+        // Profit progress
+        const profitGoal = 50000;
+        const profitProgress = Math.min(100, (state.stats.totalProfit / profitGoal) * 100);
+        const profitEl = document.getElementById('victory-profit');
+        const profitBarEl = document.getElementById('victory-profit-bar');
+        if (profitEl) profitEl.textContent = `${Game.formatMoney(state.stats.totalProfit)} / ${Game.formatMoney(profitGoal)}`;
+        if (profitBarEl) {
+            profitBarEl.style.width = `${profitProgress}%`;
+            profitBarEl.style.backgroundColor = profitProgress >= 100 ? 'var(--color-primary)' : 'var(--color-secondary)';
+        }
+
+        // Clients progress
+        const clientsGoal = 10;
+        const clientsProgress = Math.min(100, (state.clients.length / clientsGoal) * 100);
+        const clientsEl = document.getElementById('victory-clients');
+        const clientsBarEl = document.getElementById('victory-clients-bar');
+        if (clientsEl) clientsEl.textContent = `${state.clients.length} / ${clientsGoal}`;
+        if (clientsBarEl) {
+            clientsBarEl.style.width = `${clientsProgress}%`;
+            clientsBarEl.style.backgroundColor = clientsProgress >= 100 ? 'var(--color-primary)' : 'var(--color-secondary)';
+        }
+
+        // Employees progress
+        const employeesGoal = 5;
+        const employeesProgress = Math.min(100, (state.employees.length / employeesGoal) * 100);
+        const employeesEl = document.getElementById('victory-employees');
+        const employeesBarEl = document.getElementById('victory-employees-bar');
+        if (employeesEl) employeesEl.textContent = `${state.employees.length} / ${employeesGoal}`;
+        if (employeesBarEl) {
+            employeesBarEl.style.width = `${employeesProgress}%`;
+            employeesBarEl.style.backgroundColor = employeesProgress >= 100 ? 'var(--color-primary)' : 'var(--color-secondary)';
+        }
     },
 
     // Add entry to action log
@@ -712,6 +759,112 @@ const UI = {
     // Close game over modal
     closeGameOverModal() {
         const modal = document.getElementById('game-over-modal');
+        if (modal) {
+            modal.style.display = 'none';
+        }
+    },
+
+    // Show help modal
+    showHelpModal() {
+        let modal = document.getElementById('help-modal');
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.id = 'help-modal';
+            modal.className = 'help-modal';
+            document.body.appendChild(modal);
+        }
+
+        modal.innerHTML = `
+            <div class="help-content">
+                <div class="help-header">
+                    <h2>📖 How to Play</h2>
+                    <button class="help-close" onclick="UI.closeHelpModal()">×</button>
+                </div>
+                <div class="help-body">
+                    <section class="help-section">
+                        <h3>🎯 Goal</h3>
+                        <p>Build a successful pest control empire! Reach <strong>$50,000 profit</strong> with <strong>10+ clients</strong> and <strong>5+ employees</strong> to win.</p>
+                    </section>
+
+                    <section class="help-section">
+                        <h3>🔄 Turns</h3>
+                        <p>The game is turn-based. Each turn represents <strong>1 week</strong>. Click "Next Week" to execute your planned actions and advance time.</p>
+                    </section>
+
+                    <section class="help-section">
+                        <h3>👥 Clients</h3>
+                        <p><strong>Cost:</strong> $200-$600 to acquire</p>
+                        <p><strong>Revenue:</strong> $150-$400/week when serviced</p>
+                        <p><strong>Satisfaction:</strong> Starts at 85-95%, decays over time</p>
+                        <ul>
+                            <li>Serviced clients generate full revenue and gain satisfaction</li>
+                            <li>Unserviced clients generate NO revenue and lose satisfaction faster</li>
+                            <li>Clients leave if satisfaction drops too low</li>
+                        </ul>
+                    </section>
+
+                    <section class="help-section">
+                        <h3>🚚 Employees</h3>
+                        <p><strong>Cost:</strong> $1,800-$3,500 (includes truck)</p>
+                        <p><strong>Salary:</strong> $400-$800/week</p>
+                        <p><strong>Capacity:</strong> Can service 1-3 clients per week</p>
+                        <ul>
+                            <li>Assign employees to clients to service them</li>
+                            <li>Employee skill affects client satisfaction</li>
+                            <li>Better employees cost more but perform better</li>
+                        </ul>
+                    </section>
+
+                    <section class="help-section">
+                        <h3>🔧 Equipment & Upgrades</h3>
+                        <p>Purchase equipment and upgrades to improve your operations:</p>
+                        <ul>
+                            <li><strong>Equipment:</strong> One-time purchases that boost job quality</li>
+                            <li><strong>Upgrades:</strong> Three paths (Speed, Service, Eco-Friendly)</li>
+                            <li>Unlocks require prerequisites and progress through tiers</li>
+                        </ul>
+                    </section>
+
+                    <section class="help-section">
+                        <h3>🎲 Events</h3>
+                        <p>Random events occur each turn:</p>
+                        <ul>
+                            <li><strong>Positive:</strong> New clients, equipment deals, bonuses</li>
+                            <li><strong>Negative:</strong> Pest surges, breakdowns, competition</li>
+                            <li>Some events are more likely in certain seasons</li>
+                        </ul>
+                    </section>
+
+                    <section class="help-section">
+                        <h3>💡 Tips</h3>
+                        <ul>
+                            <li>Start by acquiring 2-3 clients, then hire an employee</li>
+                            <li>Always keep clients serviced to maintain satisfaction</li>
+                            <li>Watch your cash flow - don't hire too many employees too fast</li>
+                            <li>Buy equipment early to improve employee performance</li>
+                            <li>Diversify client types for stable revenue</li>
+                            <li>Game auto-saves after each turn</li>
+                        </ul>
+                    </section>
+
+                    <section class="help-section">
+                        <h3>💀 Game Over</h3>
+                        <p><strong>Bankruptcy:</strong> Cash drops below $0</p>
+                        <p><strong>Victory:</strong> $50,000 profit + 10 clients + 5 employees</p>
+                    </section>
+                </div>
+                <div class="help-footer">
+                    <button class="btn btn-primary" onclick="UI.closeHelpModal()">Got it!</button>
+                </div>
+            </div>
+        `;
+
+        modal.style.display = 'flex';
+    },
+
+    // Close help modal
+    closeHelpModal() {
+        const modal = document.getElementById('help-modal');
         if (modal) {
             modal.style.display = 'none';
         }

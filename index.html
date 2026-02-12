@@ -104,6 +104,28 @@
                             <div class="stat-card-label">Total Profit</div>
                         </div>
                     </div>
+
+                    <div class="victory-progress">
+                        <h3>Victory Progress</h3>
+                        <div class="progress-item">
+                            <span class="progress-label">Profit: <span id="victory-profit">$0 / $50,000</span></span>
+                            <div class="progress-bar">
+                                <div id="victory-profit-bar" class="progress-fill" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div class="progress-item">
+                            <span class="progress-label">Clients: <span id="victory-clients">0 / 10</span></span>
+                            <div class="progress-bar">
+                                <div id="victory-clients-bar" class="progress-fill" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div class="progress-item">
+                            <span class="progress-label">Employees: <span id="victory-employees">0 / 5</span></span>
+                            <div class="progress-bar">
+                                <div id="victory-employees-bar" class="progress-fill" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="panel">
@@ -125,7 +147,7 @@
             <aside class="sidebar sidebar-right">
                 <div class="panel">
                     <h2>Business Actions</h2>
-                    <button id="acquire-client-btn" class="btn btn-primary">
+                    <button id="acquire-client-btn" class="btn btn-primary" title="Acquire a new client to generate weekly revenue">
                         Acquire Client
                     </button>
                     <div class="action-info">
@@ -133,7 +155,7 @@
                         <p>Gain a new revenue stream</p>
                     </div>
 
-                    <button id="hire-employee-btn" class="btn btn-primary">
+                    <button id="hire-employee-btn" class="btn btn-primary" title="Hire an employee with a truck to service clients">
                         Hire Employee
                     </button>
                     <div class="action-info">
@@ -144,7 +166,7 @@
 
                 <div class="panel">
                     <h2>Turn Controls</h2>
-                    <button id="next-week-btn" class="btn btn-primary btn-large">
+                    <button id="next-week-btn" class="btn btn-primary btn-large" title="Process all jobs and advance to the next week">
                         Next Week →
                     </button>
                     <div class="turn-info">
@@ -154,9 +176,10 @@
 
                 <div class="panel">
                     <h2>Game Menu</h2>
-                    <button id="new-game-btn" class="btn btn-secondary">New Game</button>
-                    <button id="save-game-btn" class="btn btn-secondary">Save Game</button>
-                    <button id="load-game-btn" class="btn btn-secondary">Load Game</button>
+                    <button id="new-game-btn" class="btn btn-secondary" title="Start a new game (current progress will be lost)">New Game</button>
+                    <button id="save-game-btn" class="btn btn-secondary" title="Manually save your current progress">Save Game</button>
+                    <button id="load-game-btn" class="btn btn-secondary" title="Load your most recent save">Load Game</button>
+                    <button id="help-btn" class="btn btn-secondary" title="View game tutorial and mechanics">📖 Help</button>
                 </div>
             </aside>
         </main>
