@@ -67,10 +67,17 @@
             <!-- Center Content Area -->
             <section class="content-area">
                 <div class="panel">
+                    <h2>Client Portfolio</h2>
+                    <div id="client-list" class="client-list">
+                        <p class="empty-state">No clients yet. Acquire your first client to start generating revenue!</p>
+                    </div>
+                </div>
+
+                <div class="panel">
                     <h2>Action Center</h2>
                     <div id="action-log" class="action-log">
                         <p class="log-entry">Welcome to Pest Empire Tycoon! Build your pest control empire one week at a time.</p>
-                        <p class="log-entry">Click "Next Week" to advance time and see your business grow.</p>
+                        <p class="log-entry">Acquire clients to generate revenue and grow your business.</p>
                     </div>
                 </div>
 
@@ -95,6 +102,17 @@
 
             <!-- Right Sidebar - Controls -->
             <aside class="sidebar sidebar-right">
+                <div class="panel">
+                    <h2>Business Actions</h2>
+                    <button id="acquire-client-btn" class="btn btn-primary">
+                        Acquire Client
+                    </button>
+                    <div class="action-info">
+                        <p>Cost: $200 - $600</p>
+                        <p>Gain a new revenue stream</p>
+                    </div>
+                </div>
+
                 <div class="panel">
                     <h2>Turn Controls</h2>
                     <button id="next-week-btn" class="btn btn-primary btn-large">
@@ -121,6 +139,7 @@
     </div>
 
     <!-- Scripts -->
+    <script src="js/client.js"></script>
     <script src="js/game.js"></script>
     <script src="js/ui.js"></script>
     <script>

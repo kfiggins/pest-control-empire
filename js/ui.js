@@ -43,10 +43,14 @@ const UI = {
             totalExpenses: document.getElementById('total-expenses'),
             totalProfit: document.getElementById('total-profit'),
 
+            // Client list
+            clientList: document.getElementById('client-list'),
+
             // Action log
             actionLog: document.getElementById('action-log'),
 
             // Buttons
+            acquireClientBtn: document.getElementById('acquire-client-btn'),
             nextWeekBtn: document.getElementById('next-week-btn'),
             newGameBtn: document.getElementById('new-game-btn'),
             saveGameBtn: document.getElementById('save-game-btn'),
@@ -56,6 +60,11 @@ const UI = {
 
     // Set up all event listeners
     setupEventListeners() {
+        // Acquire Client button
+        this.elements.acquireClientBtn.addEventListener('click', () => {
+            this.onAcquireClient();
+        });
+
         // Next Week button
         this.elements.nextWeekBtn.addEventListener('click', () => {
             this.onNextWeek();
@@ -74,6 +83,14 @@ const UI = {
         this.elements.loadGameBtn.addEventListener('click', () => {
             this.addLogEntry('Load feature coming in Phase 6!');
         });
+    },
+
+    // Handle Acquire Client button click
+    onAcquireClient() {
+        const success = Game.acquireClient();
+        if (success) {
+            this.update();
+        }
     },
 
     // Handle Next Week button click
@@ -144,6 +161,9 @@ const UI = {
         this.elements.totalRevenue.textContent = Game.formatMoney(state.stats.totalRevenue);
         this.elements.totalExpenses.textContent = Game.formatMoney(state.stats.totalExpenses);
         this.elements.totalProfit.textContent = Game.formatMoney(state.stats.totalProfit);
+
+        // Render client list
+        this.renderClientList();
     },
 
     // Add entry to action log
@@ -167,6 +187,81 @@ const UI = {
     // Clear action log
     clearLog() {
         this.elements.actionLog.innerHTML = '';
+    },
+
+    // Render client list
+    renderClientList() {
+        const state = Game.getState();
+        const clientList = this.elements.clientList;
+
+        // Clear existing content
+        clientList.innerHTML = '';
+
+        // Show empty state if no clients
+        if (state.clients.length === 0) {
+            const emptyState = document.createElement('p');
+            emptyState.className = 'empty-state';
+            emptyState.textContent = 'No clients yet. Acquire your first client to start generating revenue!';
+            clientList.appendChild(emptyState);
+            return;
+        }
+
+        // Render each client
+        state.clients.forEach(client => {
+            const clientCard = document.createElement('div');
+            clientCard.className = 'client-card';
+
+            const satisfactionStatus = ClientManager.getSatisfactionStatus(client.satisfaction);
+            const weeklyRevenue = ClientManager.calculateRevenue(client);
+
+            clientCard.innerHTML = `
+                <div class="client-header">
+                    <div class="client-name">${client.name}</div>
+                    <div class="client-type" style="color: ${client.typeData.color}">
+                        ${client.typeData.name}
+                    </div>
+                </div>
+                <div class="client-stats">
+                    <div class="client-stat">
+                        <span class="client-stat-label">Satisfaction:</span>
+                        <span class="client-stat-value" style="color: ${satisfactionStatus.color}">
+                            ${Math.floor(client.satisfaction)}% - ${satisfactionStatus.text}
+                        </span>
+                    </div>
+                    <div class="client-stat">
+                        <span class="client-stat-label">Weekly Revenue:</span>
+                        <span class="client-stat-value positive">
+                            ${Game.formatMoney(weeklyRevenue)}
+                        </span>
+                    </div>
+                    <div class="client-stat">
+                        <span class="client-stat-label">Weeks Active:</span>
+                        <span class="client-stat-value">
+                            ${client.weeksActive}
+                        </span>
+                    </div>
+                    <div class="client-stat">
+                        <span class="client-stat-label">Total Revenue:</span>
+                        <span class="client-stat-value">
+                            ${Game.formatMoney(client.totalRevenue)}
+                        </span>
+                    </div>
+                </div>
+                <div class="client-demands">
+                    ${client.demands.map(demand => `<span class="demand-tag">${demand}</span>`).join('')}
+                </div>
+            `;
+
+            // Add satisfaction bar
+            const satisfactionBar = document.createElement('div');
+            satisfactionBar.className = 'satisfaction-bar';
+            satisfactionBar.innerHTML = `
+                <div class="satisfaction-fill" style="width: ${client.satisfaction}%; background-color: ${satisfactionStatus.color}"></div>
+            `;
+            clientCard.appendChild(satisfactionBar);
+
+            clientList.appendChild(clientCard);
+        });
     }
 };
 

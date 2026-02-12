@@ -77,12 +77,21 @@ const Game = {
 
     // Process all revenue sources
     processRevenue() {
-        // Currently no revenue sources (clients will be added in Phase 2)
-        // Placeholder for future revenue logic
+        // Process client revenue
+        let clientRevenue = 0;
 
-        // Example: Base weekly revenue just to show the system works
-        const baseRevenue = 0; // Will come from clients later
-        this.addRevenue(baseRevenue);
+        this.state.clients.forEach(client => {
+            const revenue = ClientManager.calculateRevenue(client);
+            clientRevenue += revenue;
+            client.totalRevenue += revenue;
+            client.weeksActive++;
+        });
+
+        if (clientRevenue > 0) {
+            this.logAction(`Client revenue: ${this.formatMoney(clientRevenue)} from ${this.state.clients.length} clients`);
+        }
+
+        this.addRevenue(clientRevenue);
     },
 
     // Process all expenses
@@ -102,6 +111,30 @@ const Game = {
 
     // Update overall game state after turn
     updateGameState() {
+        // Update client satisfaction
+        const clientsToRemove = [];
+
+        this.state.clients.forEach((client, index) => {
+            const oldSatisfaction = client.satisfaction;
+            ClientManager.updateSatisfaction(client);
+
+            // Check if client should be lost
+            if (ClientManager.shouldLoseClient(client)) {
+                clientsToRemove.push(index);
+                this.logAction(`❌ Lost client: ${client.name} (satisfaction too low)`);
+                this.state.stats.clientsLost++;
+            } else if (Math.floor(oldSatisfaction / 20) !== Math.floor(client.satisfaction / 20)) {
+                // Log significant satisfaction changes
+                const status = ClientManager.getSatisfactionStatus(client.satisfaction);
+                this.logAction(`${client.name} satisfaction: ${status.text} (${Math.floor(client.satisfaction)}%)`);
+            }
+        });
+
+        // Remove lost clients (in reverse order to maintain indices)
+        for (let i = clientsToRemove.length - 1; i >= 0; i--) {
+            this.state.clients.splice(clientsToRemove[i], 1);
+        }
+
         // Calculate net profit for the week
         const netProfit = this.state.weeklyRevenue - this.state.weeklyExpenses;
 
@@ -208,6 +241,30 @@ const Game = {
     // Get current game state (for debugging and save/load)
     getState() {
         return this.state;
+    },
+
+    // Acquire a new client
+    acquireClient(typeKey = null) {
+        const client = ClientManager.generateClient(typeKey);
+        const cost = client.typeData.acquisitionCost;
+
+        // Check if we can afford it
+        if (this.state.money < cost) {
+            this.logAction(`❌ Cannot acquire ${client.name} - insufficient funds (need ${this.formatMoney(cost)})`);
+            return false;
+        }
+
+        // Deduct cost
+        this.state.money -= cost;
+
+        // Add client
+        this.state.clients.push(client);
+        this.state.stats.clientsAcquired++;
+
+        this.logAction(`✅ Acquired client: ${client.name} (${client.typeData.name}) - Cost: ${this.formatMoney(cost)}`);
+
+        console.log(`🤝 New client: ${client.name}`, client);
+        return true;
     }
 };
 
