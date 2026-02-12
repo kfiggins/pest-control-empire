@@ -484,7 +484,7 @@ const UI = {
                     ${assignedClientsHTML}
                 </div>
                 <div class="employee-actions">
-                    ${this.renderEmployeeAssignmentControls(employee, state.clients)}
+                    ${this.renderEmployeeAssignmentControls(employee, state.clients, state.employees)}
                 </div>
                 ${this.renderPromotionButton(employee, state)}
             `;
@@ -497,7 +497,7 @@ const UI = {
     },
 
     // Render assignment controls for an employee
-    renderEmployeeAssignmentControls(employee, clients) {
+    renderEmployeeAssignmentControls(employee, clients, allEmployees) {
         if (clients.length === 0) {
             return '<p class="assignment-hint">No clients to assign</p>';
         }
@@ -508,9 +508,8 @@ const UI = {
         }
 
         // Get all assigned client IDs from ALL employees
-        const state = Game.getState();
         const allAssignedClientIds = new Set();
-        state.employees.forEach(emp => {
+        allEmployees.forEach(emp => {
             emp.assignedClients.forEach(clientId => allAssignedClientIds.add(clientId));
         });
 
