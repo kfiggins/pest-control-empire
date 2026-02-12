@@ -43,14 +43,16 @@ const UI = {
             totalExpenses: document.getElementById('total-expenses'),
             totalProfit: document.getElementById('total-profit'),
 
-            // Client list
+            // Lists
             clientList: document.getElementById('client-list'),
+            employeeList: document.getElementById('employee-list'),
 
             // Action log
             actionLog: document.getElementById('action-log'),
 
             // Buttons
             acquireClientBtn: document.getElementById('acquire-client-btn'),
+            hireEmployeeBtn: document.getElementById('hire-employee-btn'),
             nextWeekBtn: document.getElementById('next-week-btn'),
             newGameBtn: document.getElementById('new-game-btn'),
             saveGameBtn: document.getElementById('save-game-btn'),
@@ -63,6 +65,11 @@ const UI = {
         // Acquire Client button
         this.elements.acquireClientBtn.addEventListener('click', () => {
             this.onAcquireClient();
+        });
+
+        // Hire Employee button
+        this.elements.hireEmployeeBtn.addEventListener('click', () => {
+            this.onHireEmployee();
         });
 
         // Next Week button
@@ -88,6 +95,14 @@ const UI = {
     // Handle Acquire Client button click
     onAcquireClient() {
         const success = Game.acquireClient();
+        if (success) {
+            this.update();
+        }
+    },
+
+    // Handle Hire Employee button click
+    onHireEmployee() {
+        const success = Game.hireEmployee();
         if (success) {
             this.update();
         }
@@ -164,6 +179,9 @@ const UI = {
 
         // Render client list
         this.renderClientList();
+
+        // Render employee list
+        this.renderEmployeeList();
     },
 
     // Add entry to action log
@@ -261,6 +279,134 @@ const UI = {
             clientCard.appendChild(satisfactionBar);
 
             clientList.appendChild(clientCard);
+        });
+    },
+
+    // Render employee list
+    renderEmployeeList() {
+        const state = Game.getState();
+        const employeeList = this.elements.employeeList;
+
+        // Clear existing content
+        employeeList.innerHTML = '';
+
+        // Show empty state if no employees
+        if (state.employees.length === 0) {
+            const emptyState = document.createElement('p');
+            emptyState.className = 'empty-state';
+            emptyState.textContent = 'No employees yet. Hire your first employee to service clients!';
+            employeeList.appendChild(emptyState);
+            return;
+        }
+
+        // Render each employee
+        state.employees.forEach(employee => {
+            const employeeCard = document.createElement('div');
+            employeeCard.className = 'employee-card';
+
+            // Find assigned client if any
+            let assignedClientName = 'None';
+            if (employee.assignedClient) {
+                const client = state.clients.find(c => c.id === employee.assignedClient);
+                if (client) {
+                    assignedClientName = client.name;
+                }
+            }
+
+            employeeCard.innerHTML = `
+                <div class="employee-header">
+                    <div class="employee-name">${employee.name}</div>
+                    <div class="employee-skill" style="color: ${employee.skillData.color}">
+                        ${employee.skillData.name}
+                    </div>
+                </div>
+                <div class="employee-stats">
+                    <div class="employee-stat">
+                        <span class="employee-stat-label">Weekly Salary:</span>
+                        <span class="employee-stat-value negative">
+                            ${Game.formatMoney(employee.salary)}
+                        </span>
+                    </div>
+                    <div class="employee-stat">
+                        <span class="employee-stat-label">Jobs Done:</span>
+                        <span class="employee-stat-value">
+                            ${employee.totalJobsCompleted}
+                        </span>
+                    </div>
+                    <div class="employee-stat">
+                        <span class="employee-stat-label">Weeks Employed:</span>
+                        <span class="employee-stat-value">
+                            ${employee.weeksEmployed}
+                        </span>
+                    </div>
+                    <div class="employee-stat">
+                        <span class="employee-stat-label">Assigned To:</span>
+                        <span class="employee-stat-value">
+                            ${assignedClientName}
+                        </span>
+                    </div>
+                </div>
+                <div class="employee-actions">
+                    ${this.renderEmployeeAssignmentControls(employee, state.clients)}
+                </div>
+            `;
+
+            employeeList.appendChild(employeeCard);
+        });
+
+        // Add event listeners to assignment buttons
+        this.setupEmployeeAssignmentListeners();
+    },
+
+    // Render assignment controls for an employee
+    renderEmployeeAssignmentControls(employee, clients) {
+        if (clients.length === 0) {
+            return '<p class="assignment-hint">No clients to assign</p>';
+        }
+
+        if (employee.assignedClient) {
+            return `<button class="btn btn-small btn-secondary unassign-btn" data-employee-id="${employee.id}">Unassign</button>`;
+        }
+
+        // Create dropdown of available clients
+        let html = '<select class="client-select" data-employee-id="${employee.id}">';
+        html += '<option value="">Select Client...</option>';
+
+        clients.forEach(client => {
+            html += `<option value="${client.id}">${client.name}</option>`;
+        });
+
+        html += '</select>';
+        html += `<button class="btn btn-small btn-primary assign-btn" data-employee-id="${employee.id}">Assign</button>`;
+
+        return html;
+    },
+
+    // Set up event listeners for employee assignment controls
+    setupEmployeeAssignmentListeners() {
+        // Assign buttons
+        const assignBtns = document.querySelectorAll('.assign-btn');
+        assignBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const employeeId = e.target.dataset.employeeId;
+                const select = document.querySelector(`.client-select[data-employee-id="${employeeId}"]`);
+                const clientId = select.value;
+
+                if (clientId) {
+                    Game.assignEmployee(employeeId, clientId);
+                    this.update();
+                }
+            });
+        });
+
+        // Unassign buttons
+        const unassignBtns = document.querySelectorAll('.unassign-btn');
+        unassignBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const employeeId = e.target.dataset.employeeId;
+                Game.unassignEmployee(employeeId);
+                this.update();
+            });
         });
     }
 };

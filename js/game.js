@@ -53,6 +53,9 @@ const Game = {
         // Reset weekly tracking
         this.resetWeeklyStats();
 
+        // Phase 0: Process jobs (employees service clients)
+        this.processJobs();
+
         // Phase 1: Process revenue (jobs, clients)
         this.processRevenue();
 
@@ -73,6 +76,36 @@ const Game = {
         this.logAction(`Week ${this.state.week - 1} complete. Net: ${this.formatMoney(netProfit)}`);
 
         console.log(`✅ Week ${this.state.week - 1} complete. Cash: ${this.formatMoney(this.state.money)}`);
+    },
+
+    // Process jobs (employees service clients)
+    processJobs() {
+        let jobsCompleted = 0;
+
+        // Process each employee's assignment
+        this.state.employees.forEach(employee => {
+            if (employee.assignedClient) {
+                // Find the client
+                const client = this.state.clients.find(c => c.id === employee.assignedClient);
+
+                if (client) {
+                    // Service the client
+                    const result = EmployeeManager.serviceClient(employee, client);
+
+                    if (result.success) {
+                        jobsCompleted++;
+                        this.state.stats.totalJobs++;
+                    }
+                }
+            }
+
+            // Increment weeks employed
+            employee.weeksEmployed++;
+        });
+
+        if (jobsCompleted > 0) {
+            this.logAction(`✅ Completed ${jobsCompleted} service jobs`);
+        }
     },
 
     // Process all revenue sources
@@ -96,11 +129,18 @@ const Game = {
 
     // Process all expenses
     processExpenses() {
-        // Currently no expenses (employees will be added in Phase 3)
-        // Placeholder for future expense logic
+        let totalSalaries = 0;
 
-        const baseExpenses = 0; // Will come from salaries, maintenance later
-        this.addExpense(baseExpenses);
+        // Calculate employee salaries
+        this.state.employees.forEach(employee => {
+            totalSalaries += employee.salary;
+        });
+
+        if (totalSalaries > 0) {
+            this.logAction(`Employee salaries: ${this.formatMoney(totalSalaries)} for ${this.state.employees.length} employees`);
+        }
+
+        this.addExpense(totalSalaries);
     },
 
     // Process random events
@@ -264,6 +304,75 @@ const Game = {
         this.logAction(`✅ Acquired client: ${client.name} (${client.typeData.name}) - Cost: ${this.formatMoney(cost)}`);
 
         console.log(`🤝 New client: ${client.name}`, client);
+        return true;
+    },
+
+    // Hire a new employee (includes truck)
+    hireEmployee(skillKey = null) {
+        const employee = EmployeeManager.generateEmployee(skillKey);
+        const truck = EmployeeManager.generateTruck();
+        const cost = EmployeeManager.getHireCost(employee.skillLevel);
+
+        // Check if we can afford it
+        if (this.state.money < cost) {
+            this.logAction(`❌ Cannot hire ${employee.name} - insufficient funds (need ${this.formatMoney(cost)})`);
+            return false;
+        }
+
+        // Link employee and truck
+        employee.truckId = truck.id;
+        truck.assignedEmployee = employee.id;
+
+        // Deduct cost
+        this.state.money -= cost;
+
+        // Add employee and truck
+        this.state.employees.push(employee);
+        this.state.trucks.push(truck);
+
+        this.logAction(`✅ Hired ${employee.name} (${employee.skillData.name}) with truck - Cost: ${this.formatMoney(cost)}`);
+
+        console.log(`👷 New employee: ${employee.name}`, employee);
+        return true;
+    },
+
+    // Assign employee to client
+    assignEmployee(employeeId, clientId) {
+        const employee = this.state.employees.find(e => e.id === employeeId);
+        const client = this.state.clients.find(c => c.id === clientId);
+
+        if (!employee || !client) {
+            return false;
+        }
+
+        // Check if employee can be assigned
+        if (!EmployeeManager.canAssign(employee)) {
+            this.logAction(`❌ ${employee.name} is already assigned`);
+            return false;
+        }
+
+        // Assign employee to client
+        EmployeeManager.assignToClient(employee, clientId);
+        this.logAction(`📋 Assigned ${employee.name} to ${client.name}`);
+
+        return true;
+    },
+
+    // Unassign employee from client
+    unassignEmployee(employeeId) {
+        const employee = this.state.employees.find(e => e.id === employeeId);
+
+        if (!employee) {
+            return false;
+        }
+
+        const client = this.state.clients.find(c => c.id === employee.assignedClient);
+        EmployeeManager.unassign(employee);
+
+        if (client) {
+            this.logAction(`📋 Unassigned ${employee.name} from ${client.name}`);
+        }
+
         return true;
     }
 };
