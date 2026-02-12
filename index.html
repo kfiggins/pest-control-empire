@@ -201,8 +201,8 @@
     <script>
         // Initialize game on page load
         document.addEventListener('DOMContentLoaded', () => {
-            Game.init();
-            UI.init();
+            UI.init();      // Initialize UI first (sets up DOM elements)
+            Game.init();    // Then initialize game (may log messages)
         });
     </script>
 </body>
