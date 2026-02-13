@@ -20,8 +20,7 @@ const UI = {
         // Setup tab navigation
         this.setupTabNavigation();
 
-        // Initial render
-        this.update();
+        // Note: UI.update() is called externally after Game.init() to ensure game state is loaded first
     },
 
     // Cache all DOM elements we'll use

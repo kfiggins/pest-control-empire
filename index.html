@@ -254,18 +254,19 @@
     </nav>
 
     <!-- Scripts - Increment ?v= when you make changes to force browser reload -->
-    <script src="js/client.js?v=15"></script>
-    <script src="js/employee.js?v=15"></script>
-    <script src="js/equipment.js?v=15"></script>
-    <script src="js/events.js?v=15"></script>
-    <script src="js/storage.js?v=15"></script>
-    <script src="js/game.js?v=15"></script>
-    <script src="js/ui.js?v=15"></script>
+    <script src="js/client.js?v=16"></script>
+    <script src="js/employee.js?v=16"></script>
+    <script src="js/equipment.js?v=16"></script>
+    <script src="js/events.js?v=16"></script>
+    <script src="js/storage.js?v=16"></script>
+    <script src="js/game.js?v=16"></script>
+    <script src="js/ui.js?v=16"></script>
     <script>
         // Initialize game on page load
         document.addEventListener('DOMContentLoaded', () => {
             UI.init();      // Initialize UI first (sets up DOM elements)
-            Game.init();    // Then initialize game (may log messages)
+            Game.init();    // Then initialize game (loads saved state or starts new game)
+            UI.update();    // Finally render the UI with the loaded game state
         });
     </script>
 </body>
