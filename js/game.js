@@ -454,7 +454,20 @@ const Game = {
 
         // Remove lost clients (in reverse order to maintain indices)
         for (let i = clientsToRemove.length - 1; i >= 0; i--) {
-            this.state.clients.splice(clientsToRemove[i], 1);
+            const clientIndex = clientsToRemove[i];
+            const lostClient = this.state.clients[clientIndex];
+
+            // Clean up employee assignments for this lost client
+            if (lostClient) {
+                this.state.employees.forEach(employee => {
+                    const assignedIndex = employee.assignedClients.indexOf(lostClient.id);
+                    if (assignedIndex !== -1) {
+                        employee.assignedClients.splice(assignedIndex, 1);
+                    }
+                });
+            }
+
+            this.state.clients.splice(clientIndex, 1);
         }
 
         // Calculate net profit for the week
