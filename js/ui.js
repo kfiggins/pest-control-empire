@@ -612,12 +612,13 @@ const UI = {
             }
 
             const availableSlots = employee.maxClients - employee.assignedClients.length;
+            const isSick = employee.temporarilyUnassigned !== undefined;
 
             employeeCard.innerHTML = `
                 <div class="employee-header">
-                    <div class="employee-name">${employee.name}</div>
+                    <div class="employee-name">${employee.name} ${isSick ? '🤒' : ''}</div>
                     <div class="employee-skill" style="color: ${employee.skillData.color}">
-                        ${employee.skillData.name}
+                        ${isSick ? 'SICK' : employee.skillData.name}
                     </div>
                 </div>
                 <div class="employee-stats">
@@ -668,6 +669,11 @@ const UI = {
     renderEmployeeAssignmentControls(employee, clients, allEmployees) {
         if (clients.length === 0) {
             return '<p class="assignment-hint">No clients to assign</p>';
+        }
+
+        // Check if employee is sick
+        if (employee.temporarilyUnassigned) {
+            return '<p class="assignment-hint" style="color: var(--color-accent);">🤒 Employee is sick and cannot work this week</p>';
         }
 
         // Check if employee is at capacity

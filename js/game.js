@@ -788,6 +788,12 @@ const Game = {
             return false;
         }
 
+        // Check if employee is sick
+        if (employee.temporarilyUnassigned) {
+            this.logAction(`❌ ${employee.name} is sick and cannot be assigned to clients`);
+            return false;
+        }
+
         // Check if employee can be assigned
         if (!EmployeeManager.canAssign(employee)) {
             this.logAction(`❌ ${employee.name} is at full capacity (${employee.maxClients} clients)`);
