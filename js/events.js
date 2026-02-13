@@ -329,9 +329,12 @@ const EventManager = {
     },
 
     /**
-     * Process turn cleanup (restore sick employees, etc.)
+     * Process turn cleanup (restore sick employees, clear previous events, etc.)
      */
     processTurnCleanup(gameState) {
+        // Clear previous turn's active event (so discounts/effects only last one week)
+        this.clearActiveEvent();
+
         // Restore sick employees from last turn
         gameState.employees.forEach(employee => {
             if (employee.temporarilyUnassigned) {

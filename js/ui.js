@@ -483,11 +483,10 @@ const UI = {
         }
     },
 
-    // Dismiss the active event notification
+    // Dismiss the active event notification (event effect persists until next turn)
     dismissEvent() {
-        if (window.EventManager) {
-            EventManager.clearActiveEvent();
-        }
+        // Note: We don't clear the active event here - it persists until next turn
+        // This allows discounts and other effects to last the entire week
         const eventNotification = document.getElementById('event-notification');
         if (eventNotification) {
             eventNotification.style.display = 'none';
