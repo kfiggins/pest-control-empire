@@ -353,13 +353,19 @@ const UI = {
             }).length;
 
             const totalCount = state.clients.length;
-            const clientBadge = totalCount > 0 ? `<div><span class="tab-badge">${assignedCount}/${totalCount}</span></div>` : '';
 
             if (clientsTabBtn) {
-                clientsTabBtn.innerHTML = `
-                    <div>👥 Clients</div>
-                    ${clientBadge}
-                `;
+                // Remove existing badges
+                const existingBadge = clientsTabBtn.querySelector('.tab-badge');
+                if (existingBadge) existingBadge.remove();
+
+                // Add new badge if needed
+                if (totalCount > 0) {
+                    const badge = document.createElement('span');
+                    badge.className = 'tab-badge';
+                    badge.textContent = `${assignedCount}/${totalCount}`;
+                    clientsTabBtn.appendChild(badge);
+                }
             }
             if (clientsBottomNav) {
                 const label = clientsBottomNav.querySelector('.label');
@@ -382,18 +388,26 @@ const UI = {
                 return promotionInfo && promotionInfo.canPromote;
             }).length;
 
-            const empBadgeHTML = employeeCount > 0 || promotableCount > 0 ? `
-                <div>
-                    ${employeeCount > 0 ? `<span class="tab-badge">${employeeCount}</span>` : ''}
-                    ${promotableCount > 0 ? `<span class="tab-notification">${promotableCount}</span>` : ''}
-                </div>
-            ` : '';
-
             if (employeesTabBtn) {
-                employeesTabBtn.innerHTML = `
-                    <div>👷 Employees</div>
-                    ${empBadgeHTML}
-                `;
+                // Remove existing badges
+                const existingBadges = employeesTabBtn.querySelectorAll('.tab-badge, .tab-notification');
+                existingBadges.forEach(b => b.remove());
+
+                // Add count badge if needed
+                if (employeeCount > 0) {
+                    const badge = document.createElement('span');
+                    badge.className = 'tab-badge';
+                    badge.textContent = employeeCount;
+                    employeesTabBtn.appendChild(badge);
+                }
+
+                // Add promotion notification if needed
+                if (promotableCount > 0) {
+                    const notification = document.createElement('span');
+                    notification.className = 'tab-notification';
+                    notification.textContent = promotableCount;
+                    employeesTabBtn.appendChild(notification);
+                }
             }
             if (employeesBottomNav) {
                 const label = employeesBottomNav.querySelector('.label');
@@ -884,7 +898,13 @@ const UI = {
         paths.forEach(path => {
             const pathSection = document.createElement('div');
             pathSection.className = 'upgrade-path';
-            pathSection.innerHTML = `<h3>${pathNames[path]}</h3>`;
+
+            // Use applause logo for operations path
+            const pathTitle = path === 'operations'
+                ? `<h3><img src="applause.svg" alt="Operations Automation" class="path-logo"></h3>`
+                : `<h3>${pathNames[path]}</h3>`;
+
+            pathSection.innerHTML = pathTitle;
 
             const upgrades = EquipmentManager.getUpgradesByPath(path);
 
@@ -1096,7 +1116,7 @@ const UI = {
                             <li>Serviced clients generate full revenue and gain satisfaction</li>
                             <li>Unserviced clients generate NO revenue and lose satisfaction faster</li>
                             <li>Clients leave if satisfaction drops below 20%</li>
-                            <li><strong>Referrals:</strong> Clients with 80+ satisfaction have 15% chance to refer a free client each week</li>
+                            <li><strong>Referrals:</strong> Clients with 80+ satisfaction have 3% chance to refer a free client each week</li>
                         </ul>
                     </section>
 
