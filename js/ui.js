@@ -832,11 +832,35 @@ const UI = {
             return;
         }
 
+        // Check for active discount
+        const activeEvent = window.EventManager ? EventManager.getActiveEvent() : null;
+        const discount = activeEvent?.discount || 0;
+
         available.forEach(equip => {
             const equipCard = document.createElement('div');
             equipCard.className = 'equipment-card';
 
-            const canAfford = state.money >= equip.cost;
+            // Calculate actual cost with discount
+            let actualCost = equip.cost;
+            if (discount > 0) {
+                actualCost = Math.floor(equip.cost * (1 - discount));
+            }
+
+            const canAfford = state.money >= actualCost;
+
+            // Build price display
+            let priceHTML;
+            if (discount > 0) {
+                priceHTML = `
+                    <span class="equipment-cost ${canAfford ? 'positive' : 'negative'}">
+                        <span style="text-decoration: line-through; opacity: 0.6; font-size: 0.9em;">${Game.formatMoney(equip.cost)}</span>
+                        <span style="color: var(--color-accent); font-weight: 700;">${Game.formatMoney(actualCost)}</span>
+                        <span style="font-size: 0.8em; color: var(--color-accent);">(${Math.round(discount * 100)}% OFF)</span>
+                    </span>
+                `;
+            } else {
+                priceHTML = `<span class="equipment-cost ${canAfford ? 'positive' : 'negative'}">${Game.formatMoney(equip.cost)}</span>`;
+            }
 
             equipCard.innerHTML = `
                 <div class="equipment-header">
@@ -850,7 +874,7 @@ const UI = {
                     ${equip.ecoBonus ? `<span>+${equip.ecoBonus} Eco Bonus</span>` : ''}
                 </div>
                 <div class="equipment-footer">
-                    <span class="equipment-cost ${canAfford ? 'positive' : 'negative'}">${Game.formatMoney(equip.cost)}</span>
+                    ${priceHTML}
                     <button class="btn btn-small ${canAfford ? 'btn-primary' : 'btn-disabled'}"
                             data-equipment-id="${equip.id}"
                             ${!canAfford ? 'disabled' : ''}>

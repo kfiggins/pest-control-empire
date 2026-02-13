@@ -828,19 +828,31 @@ const Game = {
             return false;
         }
 
+        // Calculate actual cost (with discount if active)
+        let actualCost = equipment.cost;
+        const activeEvent = window.EventManager ? EventManager.getActiveEvent() : null;
+        const discount = activeEvent?.discount || 0;
+
+        if (discount > 0) {
+            actualCost = Math.floor(equipment.cost * (1 - discount));
+        }
+
         // Check if we can afford it
-        if (this.state.money < equipment.cost) {
-            this.logAction(`❌ Cannot purchase ${equipment.name} - insufficient funds (need ${this.formatMoney(equipment.cost)})`);
+        if (this.state.money < actualCost) {
+            this.logAction(`❌ Cannot purchase ${equipment.name} - insufficient funds (need ${this.formatMoney(actualCost)})`);
             return false;
         }
 
         // Deduct cost
-        this.state.money -= equipment.cost;
+        this.state.money -= actualCost;
 
         // Add equipment
         this.state.ownedEquipment.push(equipmentId);
 
-        this.logAction(`✅ Purchased ${equipment.name} - Cost: ${this.formatMoney(equipment.cost)}`);
+        const costMessage = discount > 0
+            ? `${this.formatMoney(actualCost)} (${Math.round(discount * 100)}% off!)`
+            : this.formatMoney(actualCost);
+        this.logAction(`✅ Purchased ${equipment.name} - Cost: ${costMessage}`);
 
         console.log(`🔧 New equipment: ${equipment.name}`, equipment);
         return true;
