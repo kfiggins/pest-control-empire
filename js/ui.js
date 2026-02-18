@@ -7,6 +7,9 @@ const UI = {
     // DOM element references
     elements: {},
 
+    // Track whether the user dismissed the current event notification
+    eventDismissed: false,
+
     // Initialize UI
     init() {
         console.log('🎨 UI initialized');
@@ -168,6 +171,9 @@ const UI = {
 
     // Handle Next Week button click
     onNextWeek() {
+        // Reset event dismissed flag so new events can show
+        this.eventDismissed = false;
+
         // Add visual feedback
         this.elements.nextWeekBtn.classList.add('btn-processing');
         this.elements.nextWeekBtn.textContent = 'Processing...';
@@ -448,6 +454,9 @@ const UI = {
     displayEventNotification() {
         if (!window.EventManager) return;
 
+        // Don't re-show if user already dismissed this event
+        if (this.eventDismissed) return;
+
         const event = EventManager.getActiveEvent();
 
         // Find or create event notification area
@@ -485,8 +494,10 @@ const UI = {
 
     // Dismiss the active event notification (event effect persists until next turn)
     dismissEvent() {
-        // Note: We don't clear the active event here - it persists until next turn
+        // Mark as dismissed so it won't re-show on subsequent UI updates
+        // Note: We don't clear the active event - it persists until next turn
         // This allows discounts and other effects to last the entire week
+        this.eventDismissed = true;
         const eventNotification = document.getElementById('event-notification');
         if (eventNotification) {
             eventNotification.style.display = 'none';
