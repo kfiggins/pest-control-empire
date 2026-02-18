@@ -62,8 +62,6 @@ const UI = {
             hireEmployeeBtn: document.getElementById('hire-employee-btn'),
             nextWeekBtn: document.getElementById('next-week-btn'),
             newGameBtn: document.getElementById('new-game-btn'),
-            saveGameBtn: document.getElementById('save-game-btn'),
-            loadGameBtn: document.getElementById('load-game-btn'),
             helpBtn: document.getElementById('help-btn')
         };
     },
@@ -88,15 +86,6 @@ const UI = {
         // New Game button
         this.elements.newGameBtn.addEventListener('click', () => {
             this.onNewGame();
-        });
-
-        // Save/Load buttons
-        this.elements.saveGameBtn.addEventListener('click', () => {
-            this.onSaveGame();
-        });
-
-        this.elements.loadGameBtn.addEventListener('click', () => {
-            this.onLoadGame();
         });
 
         // Help button
@@ -195,19 +184,6 @@ const UI = {
         if (confirmed) {
             Game.newGame();
             this.update();
-        }
-    },
-
-    // Handle Save Game button click
-    onSaveGame() {
-        Game.saveGame();
-    },
-
-    // Handle Load Game button click
-    onLoadGame() {
-        const confirmed = confirm('Load saved game? Current unsaved progress will be lost.');
-        if (confirmed) {
-            Game.loadGame();
         }
     },
 
@@ -1060,11 +1036,6 @@ const UI = {
 
                     // Update UI
                     this.update();
-
-                    // Save game state
-                    if (window.StorageManager) {
-                        StorageManager.autoSave(state);
-                    }
                 }
             });
         });
@@ -1223,7 +1194,7 @@ const UI = {
                             <li>Watch your cash flow - weekly overhead ($300) starts at Week 5</li>
                             <li>Invest in equipment and upgrades early - they're essential, not optional</li>
                             <li>Diversify client types for stable revenue</li>
-                            <li>Game auto-saves after each turn</li>
+                            <li>Refreshing the page starts a new game</li>
                         </ul>
                     </section>
 

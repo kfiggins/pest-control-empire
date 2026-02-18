@@ -50,21 +50,7 @@ const Game = {
     // Initialize game
     init() {
         console.log('🎮 Game initialized');
-
-        // Try to load saved game
-        if (window.StorageManager && StorageManager.hasSavedGame()) {
-            const savedState = StorageManager.loadGame();
-            if (savedState) {
-                this.state = savedState;
-                this.logAction(`Game loaded from ${StorageManager.getFormattedSaveTime()}`);
-                console.log('📂 Loaded saved game');
-            }
-        } else {
-            // No saved game - start a new game
-            this.newGame();
-        }
-
-        this.resetWeeklyStats();
+        this.newGame();
     },
 
     // Reset weekly revenue/expenses tracking
@@ -118,10 +104,6 @@ const Game = {
 
         console.log(`✅ Week ${this.state.week - 1} complete. Cash: ${this.formatMoney(this.state.money)}`);
 
-        // Auto-save after each turn
-        if (window.StorageManager) {
-            StorageManager.autoSave(this.state);
-        }
     },
 
     // Process jobs (employees service clients)
@@ -589,11 +571,6 @@ const Game = {
     newGame() {
         console.log('🔄 Starting new game');
 
-        // Delete any existing save
-        if (window.StorageManager) {
-            StorageManager.deleteSave();
-        }
-
         // Reset state
         this.state = {
             week: 1,
@@ -654,53 +631,11 @@ const Game = {
         if (window.UI && UI.update) {
             UI.update();
         }
-
-        // Save initial state
-        if (window.StorageManager) {
-            StorageManager.saveGame(this.state);
-        }
     },
 
     // Get current game state (for debugging and save/load)
     getState() {
         return this.state;
-    },
-
-    // Manual save game
-    saveGame() {
-        if (window.StorageManager) {
-            const success = StorageManager.saveGame(this.state);
-            if (success) {
-                this.logAction('💾 Game saved successfully!');
-                return true;
-            } else {
-                this.logAction('❌ Failed to save game');
-                return false;
-            }
-        }
-        return false;
-    },
-
-    // Manual load game
-    loadGame() {
-        if (window.StorageManager) {
-            const savedState = StorageManager.loadGame();
-            if (savedState) {
-                this.state = savedState;
-                this.logAction(`📂 Game loaded from ${StorageManager.getFormattedSaveTime()}`);
-
-                // Refresh UI
-                if (window.UI && UI.update) {
-                    UI.update();
-                }
-
-                return true;
-            } else {
-                this.logAction('❌ No saved game found');
-                return false;
-            }
-        }
-        return false;
     },
 
     // Calculate exponential cost multiplier for client acquisition
